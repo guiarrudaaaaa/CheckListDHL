@@ -432,8 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===== SALVAMENTO DO CHECKLIST =====
-// Função para salvar o checklist no localStorage
-function saveChecklist(event) {
+// Função para salvar o checklist no Firebase Firestore
+async function saveChecklist(event) {
     event.preventDefault();
 
     if (!secureInputValidation()) {
@@ -516,15 +516,29 @@ function saveChecklist(event) {
         })
         .filter(row => row.code !== '' || row.count !== 0 || row.per !== 0);
 
-    const existingChecklists = JSON.parse(localStorage.getItem('checklists')) || [];
-    existingChecklists.push(checklistData);
-    localStorage.setItem('checklists', JSON.stringify(existingChecklists));
+    try {
+        if (!window.firebaseDb || !window.firebaseAddDoc || !window.firebaseCollection) {
+            throw new Error('Firebase não está inicializado.');
+        }
 
-    alert('Checklist salvo localmente com sucesso!');
-    document.getElementById('mainChecklist').reset();
+        await window.firebaseAddDoc(
+            window.firebaseCollection(window.firebaseDb, 'checklists'),
+            {
+                ...checklistData,
+                createdAt: window.firebaseServerTimestamp ? window.firebaseServerTimestamp() : new Date()
+            }
+        );
+
+        alert('Checklist enviado para o painel admin com sucesso!');
+        document.getElementById('mainChecklist').reset();
+    } catch (error) {
+        console.error('Erro ao enviar dados para o painel:', error);
+        alert('Erro ao enviar o relatório para o painel admin. Verifique a conexão e tente novamente.');
+    }
 }
 
 
 // ===== CONFIGURAÇÃO DO EVENT LISTENER =====
+
 // Adiciona event listener para o formulário
 // document.getElementById('mainChecklist').addEventListener('submit', saveChecklist);

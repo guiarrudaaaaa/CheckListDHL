@@ -16,17 +16,42 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock(); // Chama imediatamente para evitar delay inicial
 
-function carregarRelatorio() {
-    const lista = document.getElementById('lista-nomes');
-    if (!lista) return;
+async function carregarRelatorio() {
+    if (!window.firebaseDb || !window.firebaseCollection || !window.firebaseGetDocs || !window.firebaseQuery || !window.firebaseOrderBy) {
+        console.error('Firebase não está inicializado no painel admin.');
+        return;
+    }
 
-    lista.innerHTML = '';
-    allChecklists.forEach(item => {
-        const li = document.createElement('li');
-        const dataH = item.checkinTime || '';
-        li.innerText = `${dataH} - ${formatValue(item.driverName)}`;
-        lista.appendChild(li);
-    });
+    try {
+        const checklistsRef = window.firebaseCollection(window.firebaseDb, 'checklists');
+        const q = window.firebaseQuery(checklistsRef, window.firebaseOrderBy('createdAt', 'desc'));
+        const snapshot = await window.firebaseGetDocs(q);
+
+        allChecklists = snapshot.docs.map(docSnapshot => {
+            const data = docSnapshot.data();
+            const checkinTime = data.checkinTime || (data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleString('pt-BR') : '');
+            return {
+                id: docSnapshot.id,
+                ...data,
+                checkinTime
+            };
+        });
+
+        updateMetrics();
+        renderTable();
+
+        const lista = document.getElementById('lista-nomes');
+        if (lista) {
+            lista.innerHTML = '';
+            allChecklists.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = `${item.checkinTime || ''} - ${formatValue(item.driverName)}`;
+                lista.appendChild(li);
+            });
+        }
+    } catch (err) {
+        console.error('Erro ao carregar relatório Firebase:', err);
+    }
 }
 
 // ===== SEGURANÇA E SANITIZAÇÃO =====
@@ -46,7 +71,7 @@ function safeSetInnerHTML(element, html) {
     element.innerHTML = sanitized;
 }
 
-// Função para validar dados carregados do localStorage
+// Função para validar dados carregados do Firestore
 function validateChecklistData(data) {
     if (!Array.isArray(data)) return [];
     return data.filter(item => {
@@ -69,13 +94,9 @@ let currentFilter = 'todos'; // Filtro atual aplicado ('todos', 'inbound', 'outb
 let allChecklists = []; // Array que armazena todos os checklists carregados
 
 // ===== CARREGAMENTO DE CHECKLISTS =====
-// Carrega os checklists do localStorage
+// Carrega os checklists do Firebase
 async function loadChecklists() {
-    const rawData = JSON.parse(localStorage.getItem('checklists')) || [];
-    allChecklists = validateChecklistData(rawData);
-    updateMetrics();
-    renderTable();
-    carregarRelatorio();
+    await carregarRelatorio();
 }
 
 // ===== ATUALIZAÇÃO DE MÉTRICAS =====
@@ -385,15 +406,21 @@ function editChecklist(index) {
 }
 
 // Função para excluir um checklist
-function deleteChecklist(index) {
-    // Confirma a exclusão
-    if (confirm('Tem certeza que deseja excluir este registro?')) {
-        // Remove o item do array
-        allChecklists.splice(index, 1);
-        // Salva no localStorage
-        localStorage.setItem('checklists', JSON.stringify(allChecklists));
-        // Recarrega a interface
-        loadChecklists();
+async function deleteChecklist(index) {
+    if (!confirm('Tem certeza que deseja excluir este registro?')) return;
+
+    const checklist = allChecklists[index];
+    if (!checklist?.id) {
+        alert('Não foi possível excluir este registro. ID ausente.');
+        return;
+    }
+
+    try {
+        await window.firebaseDeleteDoc(window.firebaseDoc(window.firebaseDb, 'checklists', checklist.id));
+        await loadChecklists();
+    } catch (err) {
+        console.error('Erro ao excluir registro do Firebase:', err);
+        alert('Erro ao excluir o registro. Tente novamente.');
     }
 }
 

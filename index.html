@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!-- ===== CONFIGURAÇÃO DO DOCUMENTO ===== -->
+    <!-- Define o tipo de documento HTML5 e idioma português brasileiro -->
+    <meta charset="UTF-8"> <!-- Codificação de caracteres UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport responsivo -->
+    <title>DHL Logistics | Smart Control Full</title> <!-- Título da página -->
+
+    <!-- ===== DEPENDÊNCIAS EXTERNAS ===== -->
+    <!-- Carrega o Tailwind CSS via CDN para estilos utilitários -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ===== ESTILOS PRÓPRIOS ===== -->
+    <!-- Carrega o arquivo CSS personalizado com estilos DHL -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- ===== CABEÇALHO PRINCIPAL ===== -->
+    <!-- Barra de navegação fixa no topo com logos e informações -->
+    <header class="navbar-fullwidth mb-8">
+        <div class="navbar-fullwidth-container max-w-[1400px] mx-auto px-6 py-4">
+            <!-- Seção esquerda: Título e subtítulo da página -->
+            <div class="navbar-left">
+                <div class="navbar-page-title">Checklist Final</div> <!-- Título principal -->
+                <div class="navbar-page-subtitle">DHL / Suzano CD CWB</div> <!-- Subtítulo com localização -->
+            </div>
+
+            <!-- Seção central: Logotipos da DHL e Suzano -->
+            <div class="navbar-center logos-center">
+                <img src="images/DHL_Logo_BF_rgb.png" alt="DHL" class="brand-logo" /> <!-- Logo DHL -->
+                <img src="images/suzano-logo.png" alt="Suzano" class="brand-logo-suzano" /> <!-- Logo Suzano -->
+            </div>
+
+            <!-- Seção direita: Relógio ao vivo -->
+            <div class="navbar-right">
+                <div id="liveClock" class="navbar-clock">00:00:00</div> <!-- Relógio atualizado dinamicamente -->
+            </div>
+        </div>
+    </header>
+
+
+    <!-- ===== CONTEÚDO PRINCIPAL ===== -->
+    <!-- Container principal com largura máxima e padding responsivo -->
+    <div class="page-shell px-4 md:px-8">
+        <div class="max-w-[1400px] mx-auto">
+            <!-- ===== FORMULÁRIO PRINCIPAL ===== -->
+            <!-- Formulário que contém todas as seções do checklist -->
+            <form id="mainChecklist" onsubmit="event.preventDefault(); saveChecklist(event);">
+
+            <!-- ===== SEÇÃO 1: IDENTIFICAÇÃO GERAL ===== -->
+            <!-- Campos para informações básicas da operação -->
+            <section class="glass-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-8 h-8 dhl-red text-white flex items-center justify-center rounded-lg font-black">01</span> <!-- Número da seção -->
+                    <h2 class="text-black font-bold uppercase">Identificação Geral</h2> <!-- Título da seção -->
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    <!-- Campo Fluxo: Seleção entre Inbound e Outbound -->
+                    <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">Fluxo</label>
+                        <select id="operationTypeSelect" class="input-field font-bold text-dhl-red" required>
+                            <option value="INBOUND">INBOUND (Entrada)</option>
+                            <option value="OUTBOUND">OUTBOUND (Saída)</option>
+                        </select>
+                    </div>
+                    <!-- Campo NF/DT: Nota fiscal ou documento de transporte -->
+                    <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">NF / DT</label>
+                        <input id="dtNumberInput" type="text" class="input-field" inputmode="numeric" pattern="\d*" required oninput="numericOnly(this)">
+                    </div>
+                    <!-- Campo Doca: Identificação da doca -->
+                    <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">Doca</label>
+                        <input id="docaInput" type="text" class="input-field" inputmode="numeric" pattern="\d*" required oninput="numericOnly(this)">
+                    </div>
+
+                    <!-- Campo Motorista: Nome do motorista -->
+                    <div class="md:col-span-6">
+                        <label class="text-[10px] font-bold text-black uppercase">Motorista</label>
+                        <input id="driverNameInput" type="text" class="input-field" required>
+                    </div>
+                    <!-- Campo CPF/CNH: Documentos do motorista -->
+                    <div class="md:col-span-3">
+                        <label class="text-[10px] font-bold text-black uppercase">CPF / CNH</label>
+                        <input id="cpfCnhInput" type="text" class="input-field" inputmode="numeric" pattern="\d*" required oninput="numericOnly(this)">
+                    </div>
+                    <!-- Campo Transportadora: Nome da empresa transportadora -->
+                    <div class="md:col-span-3">
+                        <label class="text-[10px] font-bold text-black uppercase">Transportadora</label>
+                        <input id="transportadoraInput" type="text" class="input-field" required>
+                    </div>
+
+                    <!-- Campos para placas dos veículos -->
+                    <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">Placa Cavalo</label>
+                        <input id="placaCavaloInput" type="text" class="input-field uppercase" required>
+                    </div>
+                    <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">Placa Carreta 1</label>
+                        <input id="placaCarreta1Input" type="text" class="input-field uppercase" required>
+                    </div>
+                    <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">Placa Carreta 2</label>
+                        <input id="placaCarreta2Input" type="text" class="input-field uppercase" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SEÇÃO 2: HIGIENE E ESTRUTURA ===== -->
+            <!-- Grid de critérios de higiene gerados dinamicamente -->
+            <section class="glass-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-8 h-8 dhl-red text-white flex items-center justify-center rounded-lg font-black">02</span> <!-- Número da seção -->
+                    <h2 class="text-black font-bold uppercase">Higiene e Estrutura</h2> <!-- Título da seção -->
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="hygieneGrid"></div> <!-- Container para os critérios -->
+            </section>
+
+            <!-- ===== SEÇÃO 3: CONFERÊNCIA TÉCNICA DE ITENS ===== -->
+            <!-- Tabela para conferência de itens com cálculos automáticos -->
+            <section class="glass-card p-0 overflow-hidden border-l-4 border-dhl-yellow">
+                <div class="bg-white p-5 flex justify-between items-center border-b border-muted">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">03</span> <!-- Número da seção -->
+                        <h2 class="text-black font-bold uppercase">Conferência Técnica de Itens</h2> <!-- Título da seção -->
+                    </div>
+                    <button type="button" onclick="addItemRow()" class="dhl-yellow text-black px-6 py-2 rounded-xl text-xs font-black uppercase shadow-lg">＋ Item</button> <!-- Botão para adicionar item -->
+                </div>
+
+                <div class="overflow-hidden">
+                    <table class="table-fixed-cols">
+                        <thead class="bg-panel border-b">
+                            <tr>
+                                <th class="col-desc !text-left pl-6">Descrição</th> <!-- Coluna descrição -->
+                                <th class="col-code">Código</th> <!-- Coluna código -->
+                                <th class="col-num bg-panel">Previsto</th> <!-- Coluna quantidade prevista -->
+                                <th class="col-num bg-panel">Realizado</th> <!-- Coluna quantidade realizada -->
+                                <th class="col-num text-dhl-red">Falta</th> <!-- Coluna faltas (calculada) -->
+                                <th class="col-num text-dark-green">Sobra</th> <!-- Coluna sobras (calculada) -->
+                                <th class="col-num">Avaria</th> <!-- Coluna avarias -->
+                                <th class="col-num">Scrap</th> <!-- Coluna scrap -->
+                                <th class="col-num">Av. Int.</th> <!-- Coluna avarias internas -->
+                                <th class="col-total bg-panel text-black">Total Bons</th> <!-- Coluna total bons (calculada) -->
+                                <th class="w-[50px]"></th> <!-- Coluna ações -->
+                            </tr>
+                        </thead>
+                        <tbody id="itemTableBody"></tbody> <!-- Corpo da tabela preenchido dinamicamente -->
+                    </table>
+                </div>
+
+                <!-- ===== TOTALS E RESUMO ===== -->
+                <!-- Cards com totais de faltas, sobras e itens bons -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+                    <div class="bg-panel p-6 rounded-2xl border border-muted shadow-sm">
+                        <p class="text-[9px] font-black text-black uppercase mb-3">Divergência (Faltas)</p>
+                        <p id="totalFaltas" class="text-4xl font-black text-dhl-red">0</p> <!-- Total de faltas -->
+                    </div>
+                    <div class="bg-panel p-6 rounded-2xl border border-muted shadow-sm">
+                        <p class="text-[9px] font-black text-black uppercase mb-3">Total Sobras (Não somado no Final)</p>
+                        <p id="totalSobra" class="text-4xl font-black text-dark-green">0</p> <!-- Total de sobras -->
+                    </div>
+                    <div class="bg-panel p-6 rounded-2xl border-l-4 border-dhl-yellow shadow-sm">
+                        <p class="text-[9px] font-black text-black uppercase mb-3">Total Bons p/ Entrada</p>
+                        <p id="totalBonsGeral" class="text-4xl font-black text-black">0</p> <!-- Total de itens bons -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SEÇÃO 4: CONTROLE DE PALETES ===== -->
+            <!-- Controle de pallets para operações inbound/outbound -->
+            <section class="glass-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">04</span> <!-- Número da seção -->
+                    <h2 class="text-black font-bold uppercase">Controle de Paletes (PBR)</h2> <!-- Título da seção -->
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Campo Pallets OUTBOUND -->
+                    <div id="palletsOutboundBox" class="bg-panel p-4 rounded-xl border border-muted">
+                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Pallets OUTBOUND</label>
+                        <input id="palletsOutboundInput" type="number" class="input-field font-black text-center" value="0" placeholder="30" min="0" step="1" required>
+                    </div>
+                    <!-- Campo Pallets INBOUND -->
+                    <div id="palletsInboundBox" class="bg-panel p-4 rounded-xl border border-muted">
+                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Pallets INBOUND</label>
+                        <input id="palletsInboundInput" type="number" class="input-field font-black text-center" value="0" placeholder="30" min="0" step="1" required>
+                    </div>
+                    <!-- Campo Total PBR Utilizados -->
+                    <div id="palletsTotalBox" class="bg-panel p-4 rounded-xl border border-muted">
+                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Total PBR Utilizados</label>
+                        <input id="totalPbrInput" type="number" class="input-field font-black text-center" value="0" placeholder="30" min="0" step="1" required>
+                    </div>
+                </div>
+
+                <!-- ===== SUBSEÇÃO EMBARQUE (OUT) ===== -->
+                <div id="outboundPalletSection" class="mb-8">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-[10px] font-bold text-black uppercase">Embarque (OUT)</p>
+                        <button type="button" onclick="addPalletRow('outboundPalletBody')" class="text-xs font-black uppercase px-4 py-2 border rounded-lg">Adicionar código</button>
+                    </div>
+                    <div class="table-container overflow-x-auto w-full">
+                        <table class="min-w-full w-full">
+                            <thead class="bg-panel border-b">
+                                <tr>
+                                    <th class="text-left pl-4 py-3">Código do Item</th> <!-- Código do item -->
+                                    <th class="text-right pr-4 py-3">Fardos Totais</th> <!-- Total de fardos -->
+                                    <th class="text-right pr-4 py-3">Fardos / Pallet</th> <!-- Fardos por pallet -->
+                                    <th class="w-16"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="outboundPalletBody">
+                                <!-- Linha de exemplo para embarque -->
+                                <tr class="border-b border-muted">
+                                    <td class="py-3 pl-4"><input type="number" class="input-field val-pallet-code text-right" placeholder="1" min="0" step="1" oninput="numericOnly(this)"></td>
+                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-count text-right" placeholder="10" min="0" step="1" oninput="numericOnly(this)"></td>
+                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-per text-right" placeholder="2" min="0" step="1" oninput="numericOnly(this)"></td>
+                                    <td class="text-center"><button type="button" onclick="removePalletRow(this)" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ===== SUBSEÇÃO DESCARREGAMENTO ===== -->
+                <div id="inboundPalletSection">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-[10px] font-bold text-black uppercase">Descarregamento (IN)</p>
+                        <button type="button" onclick="addPalletRow('inboundPalletBody')" class="text-xs font-black uppercase px-4 py-2 border rounded-lg">Adicionar código</button>
+                    </div>
+                    <div class="table-container overflow-x-auto w-full">
+                        <table class="min-w-full w-full">
+                            <thead class="bg-panel border-b">
+                                <tr>
+                                    <th class="text-left pl-4 py-3">Código do Item</th> <!-- Código do item -->
+                                    <th class="text-right pr-4 py-3">Fardos Totais</th> <!-- Total de fardos -->
+                                    <th class="text-right pr-4 py-3">Fardos / Pallet</th> <!-- Fardos por pallet -->
+                                    <th class="w-16"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="inboundPalletBody">
+                                <!-- Linha de exemplo para descarregamento -->
+                                <tr class="border-b border-muted">
+                                    <td class="py-3 pl-4"><input type="number" class="input-field val-pallet-code text-right" placeholder="1" min="0" step="1" oninput="numericOnly(this)"></td>
+                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-count text-right" placeholder="0" min="0" step="1" oninput="numericOnly(this)"></td>
+                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-per text-right" placeholder="0" min="0" step="1" oninput="numericOnly(this)"></td>
+                                    <td class="text-center"><button type="button" onclick="removePalletRow(this)" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== SEÇÃO 5: OBSERVAÇÕES DA CARGA ===== -->
+            <!-- Campo de texto para observações adicionais -->
+            <section class="glass-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-8 h-8 dhl-red text-white flex items-center justify-center rounded-lg font-black">05</span> <!-- Número da seção -->
+                    <h2 class="text-black font-bold uppercase">Observações da Carga</h2> <!-- Título da seção -->
+                </div>
+                <textarea class="w-full h-[80px] bg-white border border-black rounded-xl p-4 text-xs font-semibold outline-none focus-ring-dhl-red" placeholder="Lote, detalhes de avaria, etc..."></textarea> <!-- Campo de texto -->
+            </section>
+
+            <!-- ===== SEÇÃO 6: LACRES E ASSINATURAS ===== -->
+            <!-- Campos para lacres e áreas de assinatura -->
+            <section class="glass-card p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-8 h-8 dhl-red text-white flex items-center justify-center rounded-lg font-black">06</span> <!-- Número da seção -->
+                    <h2 class="text-black font-bold uppercase">Lacres e Assinaturas</h2> <!-- Título da seção -->
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Campos para lacres -->
+                    <div><label class="text-[10px] font-bold text-black uppercase">Lacre 01</label><input id="lacre1Input" type="text" class="input-field" inputmode="numeric" pattern="\d*" required oninput="numericOnly(this)"></div>
+                    <div><label class="text-[10px] font-bold text-black uppercase">Lacre 02 <span class="text-xs font-normal text-slate-500">(opcional)</span></label><input id="lacre2Input" type="text" class="input-field" inputmode="numeric" pattern="\d*" oninput="numericOnly(this)"></div>
+                    <div><label class="text-[10px] font-bold text-black uppercase">Status Lacre</label><select id="statusLacreSelect" class="input-field" required><option value="">Selecione</option><option value="Íntegro">Íntegro</option><option value="Violado">Violado</option></select></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Áreas para assinaturas -->
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold text-black uppercase mb-3">Assinatura Motorista</p>
+                        <div class="bg-white border-2 border-dashed border-black rounded-xl p-2">
+                            <canvas id="driverSignatureCanvas" class="signature-canvas w-full h-[160px]" style="touch-action: none;"></canvas>
+                            <button type="button" onclick="clearSignature('driverSignatureCanvas')" class="mt-3 btn-secondary">Limpar assinatura</button>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold text-black uppercase mb-3">Conferente (RE)</p>
+                        <div class="bg-white border-2 border-dashed border-black rounded-xl p-2">
+                            <canvas id="checkerSignatureCanvas" class="signature-canvas w-full h-[160px]" style="touch-action: none;"></canvas>
+                            <button type="button" onclick="clearSignature('checkerSignatureCanvas')" class="mt-3 btn-secondary">Limpar assinatura</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Botão de finalização -->
+                <button type="submit" class="w-full dhl-red text-white font-black py-5 rounded-2xl mt-8 uppercase tracking-widest shadow-xl btn-submit">Finalizar Checklist Operacional</button>
+            </section>
+        </form>
+    </div>
+</div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <!-- Carrega o arquivo JavaScript para funcionalidades interativas -->
+    <script src="index.js"></script>
+</body>
+</html>

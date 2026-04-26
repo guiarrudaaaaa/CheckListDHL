@@ -1,0 +1,461 @@
+/* ===== CONFIGURAÇÕES GLOBAIS E TOKENS DE DESIGN ===== */
+/* Define as cores e fontes da marca DHL para consistência visual */
+:root {
+    --dhl-yellow: #FFCC00; /* Amarelo assinatura da DHL */
+    --dhl-red: #D40511; /* Vermelho assinatura da DHL */
+    --dhl-black: #000000; /* Cor principal do texto */
+    --dhl-white: #FFFFFF; /* Cor de fundo principal */
+    --dhl-dark-green: #006443; /* Verde escuro para sucesso */
+    --border-muted: rgba(0, 0, 0, 0.12); /* Tom sutil para bordas */
+    --font-stack: 'DHL Delivery', 'Frutiger', 'Helvetica', 'Arial', sans-serif; /* Pilha de fontes com fallbacks */
+}
+
+/* ===== DECLARAÇÕES DE FONTE PERSONALIZADA ===== */
+/* Fontes proprietárias da DHL - descomente quando os arquivos estiverem disponíveis */
+/*
+@font-face {
+    font-family: 'DHL Delivery';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/DHL-Delivery-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'DHL Delivery';
+    font-style: normal;
+    font-weight: 700;
+    src: url('fonts/DHL-Delivery-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'DHL Delivery';
+    font-style: normal;
+    font-weight: 900;
+    src: url('fonts/DHL-Delivery-Black.woff2') format('woff2');
+}
+*/
+
+/* ===== RESET E ESTILOS BASE ===== */
+/* Aplica a fonte DHL Delivery em todos os elementos */
+body {
+    background: var(--dhl-white); /* Fundo branco da página */
+    font-family: var(--font-stack); /* Usa a pilha de fontes DHL */
+    color: var(--dhl-black); /* Cor padrão do texto */
+    overflow-x: hidden; /* Previne rolagem horizontal */
+    line-height: 1.5; /* Melhora a legibilidade */
+    font-weight: 400; /* Peso regular para textos */
+}
+
+/* ===== UTILITÁRIOS DE COR ===== */
+/* Classes utilitárias para cores da marca */
+.dhl-yellow { background: var(--dhl-yellow); }
+.dhl-red { background: var(--dhl-red); }
+.dhl-dark-green { background: var(--dhl-dark-green); }
+
+/* ===== LOGOTIPOS ===== */
+/* Estilos para os logotipos da DHL e Suzano */
+.brand-logo {
+    width: 140px; /* Largura do logo DHL */
+    height: auto; /* Altura proporcional */
+    display: block; /* Exibe como bloco */
+}
+
+.brand-logo-suzano {
+    width: 90px; /* Largura do logo Suzano */
+    height: auto; /* Altura proporcional */
+    margin-left: 1rem; /* Margem esquerda */
+}
+
+/* ===== BARRA DE NAVEGAÇÃO ===== */
+/* Estilos para a navbar fixa no topo */
+.navbar-fullwidth {
+    position: sticky; /* Fixa no topo */
+    top: 0; /* Distância do topo */
+    left: 0; /* Alinhamento à esquerda */
+    width: 100%; /* Largura total */
+    background: var(--dhl-yellow); /* Fundo amarelo DHL */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); /* Sombra */
+}
+
+.navbar-fullwidth-container {
+    display: flex; /* Layout flexível */
+    align-items: center; /* Alinha itens verticalmente */
+    justify-content: space-between; /* Espaça itens */
+    gap: 1rem; /* Espaçamento entre itens */
+    width: 100%; /* Largura total */
+}
+
+.navbar-left,
+.navbar-right {
+    display: flex; /* Layout flexível */
+    align-items: center; /* Alinha itens */
+    gap: 1rem; /* Espaçamento */
+}
+
+.navbar-center {
+    display: flex; /* Layout flexível */
+    justify-content: center; /* Centraliza */
+    flex: 1; /* Ocupa espaço disponível */
+}
+
+.navbar-page-title {
+    font-size: 1.1rem; /* Tamanho da fonte */
+    font-weight: 800; /* Peso black para títulos */
+    color: var(--dhl-black); /* Cor preta */
+}
+
+.navbar-page-subtitle {
+    font-size: 0.8rem; /* Tamanho menor */
+    color: var(--dhl-black); /* Cor preta */
+    text-transform: uppercase; /* Maiúsculo */
+    letter-spacing: 0.12em; /* Espaçamento entre letras */
+}
+
+.navbar-clock {
+    background: rgba(0, 0, 0, 0.08); /* Fundo sutil */
+    color: var(--dhl-black); /* Cor do texto */
+    padding: 0.65rem 1rem; /* Padding interno */
+    border-radius: 9999px; /* Bordas arredondadas */
+    font-weight: 600; /* Peso da fonte */
+    font-variant-numeric: tabular-nums; /* Números tabulares */
+}
+
+/* ===== CARDS DE CONTEÚDO ===== */
+/* Estilos para os cards de seções */
+.glass-card {
+    background: var(--dhl-white); /* Fundo branco */
+    border-radius: 24px; /* Bordas arredondadas */
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    border-left: 6px solid var(--dhl-yellow); /* Borda esquerda amarela */
+    margin-bottom: 2rem; /* Margem inferior */
+}
+
+/* ===== CAMPOS DE ENTRADA ===== */
+/* Estilos para inputs e selects */
+.input-field {
+    width: 100%; /* Largura total */
+    background: var(--dhl-white); /* Fundo branco */
+    border: 1px solid var(--border-muted); /* Borda sutil */
+    border-radius: 16px; /* Bordas arredondadas */
+    padding: 14px 18px; /* Padding interno */
+    font-size: 14px; /* Tamanho da fonte */
+    color: var(--dhl-black); /* Cor do texto */
+    transition: all 0.2s ease; /* Transição suave */
+    outline: none; /* Remove outline padrão */
+    font-weight: 400; /* Peso regular */
+}
+
+.input-field:focus {
+    border-color: var(--dhl-red); /* Borda vermelha no foco */
+    box-shadow: 0 0 0 3px rgba(212, 5, 17, 0.12); /* Sombra de foco */
+}
+
+/* ===== TABELAS ===== */
+/* Configurações para tabelas fixas */
+.table-fixed-cols { table-layout: fixed; width: 100%; } /* Layout fixo */
+.col-desc { width: 22%; } /* Largura da coluna descrição */
+.col-code { width: 10%; } /* Largura da coluna código */
+.col-num { width: 8%; } /* Largura das colunas numéricas */
+.col-total { width: 10%; } /* Largura da coluna total */
+
+/* Inputs dentro de tabelas */
+.table-input {
+    width: 100%; /* Largura total */
+    background: var(--dhl-white); /* Fundo branco */
+    text-align: center; /* Texto centralizado */
+    padding: 12px 0; /* Padding vertical */
+    border-radius: 12px; /* Bordas arredondadas */
+    border: 1px solid var(--border-muted); /* Borda sutil */
+    transition: all 0.2s ease; /* Transição */
+    outline: none; /* Remove outline */
+    font-weight: 700; /* Peso bold */
+    font-size: 12px; /* Tamanho pequeno */
+    color: var(--dhl-black); /* Cor preta */
+}
+
+.table-input:focus {
+    border-color: var(--dhl-red); /* Borda vermelha no foco */
+}
+
+/* ===== UTILITÁRIOS GERAIS ===== */
+/* Classes utilitárias para cores e estilos */
+.thin-text { color: var(--dhl-black); } /* Texto fino */
+.bg-panel { background: var(--dhl-white) !important; } /* Fundo painel */
+.border-muted { border-color: var(--border-muted) !important; } /* Borda muted */
+.text-black { color: var(--dhl-black) !important; } /* Texto preto */
+.text-dhl-yellow { color: var(--dhl-yellow) !important; } /* Texto amarelo */
+.text-dark-green { color: var(--dhl-dark-green) !important; } /* Texto verde */
+.bg-dhl-black { background: var(--dhl-black) !important; } /* Fundo preto */
+.text-center { text-align: center; } /* Centralizar texto */
+.rounded-xl { border-radius: 1rem; } /* Bordas arredondadas */
+.uppercase { text-transform: uppercase; } /* Maiúsculo */
+.font-black { font-weight: 900; } /* Peso black */
+.shadow-sm { box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08); } /* Sombra pequena */
+.text-dhl-red { color: var(--dhl-red) !important; } /* Texto vermelho */
+.border-dhl-yellow { border-color: var(--dhl-yellow) !important; } /* Borda amarela */
+.bg-black-10 { background: rgba(0, 0, 0, 0.1) !important; } /* Fundo preto 10% */
+.border-dhl-red { border-color: var(--dhl-red) !important; } /* Borda vermelha */
+.bg-dhl-red-10 { background: rgba(212, 5, 17, 0.18) !important; } /* Fundo vermelho 10% */
+
+/* ===== BOTÃO DE SUBMISSÃO ===== */
+/* Estilo especial para o botão de finalizar */
+.btn-submit {
+    transition: background-color 0.2s ease, transform 0.2s ease; /* Transições */
+}
+.btn-submit:hover {
+    background: #b90112; /* Fundo mais escuro no hover */
+    transform: translateY(-1px); /* Elevação no hover */
+}
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border-muted);
+    background: #f8f8f8;
+    color: var(--dhl-black);
+    border-radius: 16px;
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.btn-secondary:hover {
+    background: #e8e8e8;
+    transform: translateY(-1px);
+}
+.signature-canvas {
+    width: 100%;
+    height: 160px;
+    border-radius: 16px;
+    border: 1px solid var(--border-muted);
+    background: var(--dhl-white);
+    touch-action: none;
+}
+.focus-ring-dhl-red:focus {
+    outline: none; /* Remove outline */
+    box-shadow: 0 0 0 3px rgba(212, 5, 17, 0.12); /* Sombra de foco */
+}
+
+/* ===== CENTRALIZAÇÃO DE LOGOS ===== */
+/* Container para centralizar os logotipos */
+.logos-center {
+    display: flex; /* Layout flexível */
+    align-items: center; /* Alinha verticalmente */
+    gap: 1rem; /* Espaçamento */
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+    
+    .navbar-fullwidth-container {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .navbar-left,
+    .navbar-right,
+    .navbar-center {
+        justify-content: center;
+    }
+    
+    .brand-logo {
+        width: 100px;
+    }
+    
+    .brand-logo-suzano {
+        width: 70px;
+        margin-left: 0.5rem;
+    }
+    
+    .navbar-page-title {
+        font-size: 1rem;
+    }
+    
+    .navbar-page-subtitle {
+        font-size: 0.7rem;
+    }
+    
+    .navbar-clock {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .glass-card {
+        margin-bottom: 1rem;
+        border-radius: 16px;
+        border-left-width: 4px;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    
+    .input-field {
+        padding: 12px 16px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .form-group {
+        width: 100%;
+    }
+    
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .table-container th,
+    .table-container td {
+        white-space: nowrap;
+    }
+    
+    .data-table {
+        min-width: 600px;
+        font-size: 0.85rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .table-input {
+        padding: 10px 0;
+        font-size: 11px;
+    }
+    
+    .pallet-section {
+        margin-top: 1rem;
+    }
+    
+    .pallet-row {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    .pallet-input-group {
+        flex: 1;
+    }
+    
+    .btn-add-row,
+    .btn-remove-row {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .error-message {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.5rem;
+    }
+    
+    .navbar-fullwidth-container {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .brand-logo {
+        width: 80px;
+    }
+    
+    .brand-logo-suzano {
+        width: 60px;
+    }
+    
+    .navbar-page-title {
+        font-size: 0.9rem;
+    }
+    
+    .navbar-page-subtitle {
+        font-size: 0.65rem;
+    }
+    
+    .navbar-clock {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .glass-card {
+        margin-bottom: 0.75rem;
+        border-radius: 12px;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .input-field {
+        padding: 10px 14px;
+    }
+    
+    .data-table {
+        font-size: 0.8rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.25rem;
+    }
+    
+    .table-input {
+        padding: 8px 0;
+        font-size: 10px;
+    }
+    
+    .btn-submit {
+        padding: 0.875rem;
+        font-size: 1rem;
+    }
+    
+    .error-message {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 900px;
+    }
+    
+    .form-row {
+        gap: 1.5rem;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        min-width: 700px;
+    }
+}

@@ -317,14 +317,21 @@ function togglePalletSections() {
 }
 
 function validateChecklist() {
+    console.log('Iniciando validação do checklist...');
+
     const form = document.getElementById('mainChecklist');
     if (!form.checkValidity()) {
+        console.log('Formulário não é válido:', form.checkValidity());
         form.reportValidity();
         return false;
     }
 
     const operationType = document.getElementById('operationTypeSelect').value;
+    console.log('Tipo de operação:', operationType);
+
     const rows = document.querySelectorAll('#itemTableBody tr');
+    console.log('Número de linhas na tabela:', rows.length);
+
     if (rows.length === 0) {
         alert('Adicione pelo menos um item na conferência técnica.');
         return false;
@@ -334,20 +341,24 @@ function validateChecklist() {
         const description = row.querySelector('input[type="text"]');
         const code = row.querySelector('.val-item-code');
         if (!description || !description.value.trim()) {
+            console.log('Descrição vazia encontrada');
             alert('Preencha a descrição de todos os itens da conferência técnica.');
             return false;
         }
         if (!code || code.value.trim() === '') {
+            console.log('Código vazio encontrado');
             alert('Preencha o código numérico de todos os itens da conferência técnica.');
             return false;
         }
         const numbers = row.querySelectorAll('input[type="number"]');
         for (const input of numbers) {
             if (input.required && input.value.trim() === '') {
+                console.log('Campo numérico obrigatório vazio');
                 alert('Preencha todos os campos numéricos da conferência técnica.');
                 return false;
             }
             if (input.value.trim() !== '' && Number.isNaN(Number(input.value))) {
+                console.log('Campo numérico com valor inválido');
                 alert('Use apenas números nos campos numéricos da conferência técnica.');
                 return false;
             }
@@ -358,22 +369,26 @@ function validateChecklist() {
         ? document.getElementById('palletsInboundInput')
         : document.getElementById('palletsOutboundInput');
     if (!activePalletInput.value.trim()) {
+        console.log('Campo de pallets vazio');
         alert('Preencha o campo de pallets correspondente ao fluxo selecionado.');
         return false;
     }
 
     const palletBodyId = operationType === 'INBOUND' ? 'inboundPalletBody' : 'outboundPalletBody';
     if (!validatePalletSection(palletBodyId)) {
+        console.log('Validação da seção de pallets falhou');
         return false;
     }
 
     const driverCanvas = document.getElementById('driverSignatureCanvas');
     const checkerCanvas = document.getElementById('checkerSignatureCanvas');
     if (isCanvasBlank(driverCanvas) || isCanvasBlank(checkerCanvas)) {
+        console.log('Assinaturas faltando');
         alert('Por favor, assine no quadro do motorista e do conferente antes de finalizar.');
         return false;
     }
 
+    console.log('Validação passou com sucesso');
     return true;
 }
 
@@ -435,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Função para salvar o checklist no Firebase Firestore
 async function saveChecklist(event) {
     event.preventDefault();
+    console.log('Função saveChecklist chamada');
 
     if (!secureInputValidation()) {
         alert('Erro de validação de segurança. Verifique os dados inseridos.');
@@ -442,8 +458,11 @@ async function saveChecklist(event) {
     }
 
     if (!validateChecklist()) {
+        console.log('Validação falhou, não enviando dados');
         return;
     }
+
+    console.log('Validação passou, coletando dados...');
 
     const operationType = document.getElementById('operationTypeSelect').value;
 
@@ -517,11 +536,20 @@ async function saveChecklist(event) {
         .filter(row => row.code !== '' || row.count !== 0 || row.per !== 0);
 
     try {
+        console.log('Iniciando envio para Firebase...');
+        console.log('Firebase disponível:', {
+            db: !!window.firebaseDb,
+            addDoc: !!window.firebaseAddDoc,
+            collection: !!window.firebaseCollection,
+            serverTimestamp: !!window.firebaseServerTimestamp
+        });
+
         if (!window.firebaseDb || !window.firebaseAddDoc || !window.firebaseCollection) {
             throw new Error('Firebase não está inicializado.');
         }
 
-        await window.firebaseAddDoc(
+        console.log('Enviando dados para Firestore...');
+        const docRef = await window.firebaseAddDoc(
             window.firebaseCollection(window.firebaseDb, 'checklists'),
             {
                 ...checklistData,
@@ -529,6 +557,7 @@ async function saveChecklist(event) {
             }
         );
 
+        console.log('Documento enviado com sucesso:', docRef.id);
         alert('Checklist enviado para o painel admin com sucesso!');
         document.getElementById('mainChecklist').reset();
     } catch (error) {

@@ -541,4 +541,4 @@ async function saveChecklist(event) {
 // ===== CONFIGURAÇÃO DO EVENT LISTENER =====
 
 // Adiciona event listener para o formulário
-// document.getElementById('mainChecklist').addEventListener('submit', saveChecklist);
+document.getElementById('mainChecklist').addEventListener('submit', saveChecklist);

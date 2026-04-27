@@ -134,16 +134,25 @@ function updateMetrics() {
     const totalRegistros = allChecklists.length;
 
     // Atualiza os elementos HTML dos cards
-    document.getElementById('totalRegistros').textContent = totalRegistros;
-    document.getElementById('totalDocas').textContent = totalDoca;
-    document.getElementById('inboundCount').textContent = inCount;
-    document.getElementById('outboundCount').textContent = outCount;
-    document.getElementById('totalPbrCount').textContent = totalPbr;
+    const totalRegistrosEl = document.getElementById('totalRegistros');
+    const totalDocasEl = document.getElementById('totalDocas');
+    const inboundCountEl = document.getElementById('inboundCount');
+    const outboundCountEl = document.getElementById('outboundCount');
+    const totalPbrCountEl = document.getElementById('totalPbrCount');
+
+    if (totalRegistrosEl) totalRegistrosEl.textContent = totalRegistros;
+    if (totalDocasEl) totalDocasEl.textContent = totalDoca;
+    if (inboundCountEl) inboundCountEl.textContent = inCount;
+    if (outboundCountEl) outboundCountEl.textContent = outCount;
+    if (totalPbrCountEl) totalPbrCountEl.textContent = totalPbr;
 
     // Atualiza os contadores nas abas de filtro
-    document.getElementById('todosNumber').textContent = `(${totalRegistros})`;
-    document.getElementById('inboundNumber').textContent = `(${inCount})`;
-    document.getElementById('outboundNumber').textContent = `(${outCount})`;
+    const todosNumberEl = document.getElementById('todosNumber');
+    const inboundNumberEl = document.getElementById('inboundNumber');
+    const outboundNumberEl = document.getElementById('outboundNumber');
+    if (todosNumberEl) todosNumberEl.textContent = `(${totalRegistros})`;
+    if (inboundNumberEl) inboundNumberEl.textContent = `(${inCount})`;
+    if (outboundNumberEl) outboundNumberEl.textContent = `(${outCount})`;
 }
 
 // ===== FUNÇÃO UTILITÁRIA =====

@@ -140,6 +140,23 @@ function secureInputValidation() {
     return true;
 }
 
+function showFormAlert(type, message) {
+    const alertBox = document.getElementById('formAlert');
+    if (!alertBox) return;
+    alertBox.className = 'form-alert';
+    alertBox.classList.add(type === 'success' ? 'form-alert-success' : 'form-alert-error');
+    alertBox.innerHTML = '<span class="form-alert-icon">' + (type === 'success' ? '✓' : '!') + '</span><span>' + message + '</span>';
+    alertBox.classList.remove('hidden');
+    alertBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function clearFormAlert() {
+    const alertBox = document.getElementById('formAlert');
+    if (!alertBox) return;
+    alertBox.className = 'form-alert hidden';
+    alertBox.textContent = '';
+}
+
 // Função para prevenir XSS em elementos dinâmicos
 function safeSetInnerHTML(element, html) {
     if (!element || typeof html !== 'string') return;
@@ -184,20 +201,22 @@ function addItemRow() {
     tr.className = "hover:bg-slate-50";
     // Define o HTML da linha com inputs para cada coluna
     tr.innerHTML = `
-        <td class="pl-6"><input type="text" class="table-input !text-left uppercase" placeholder="ITEM" required></td> <!-- Descrição do item -->
-        <td><input type="number" class="table-input val-item-code text-center" placeholder="CÓD" min="0" step="1" required></td> <!-- Código do item -->
-        <td class="bg-blue-50/30"><input type="number" class="table-input val-previsto text-center" value="0" min="0" step="1" oninput="audit(this)" required></td> <!-- Quantidade prevista -->
-        <td class="bg-blue-50/30"><input type="number" class="table-input val-realizado text-center" value="0" min="0" step="1" oninput="audit(this)" required></td> <!-- Quantidade realizada -->
+        <td class="pl-6"><input type="text" class="table-input !text-left uppercase" placeholder="Descrição do item técnico" required></td> <!-- Descrição do item -->
+        <td><input type="number" class="table-input val-item-code text-center" placeholder="Cód." min="0" step="1" required></td> <!-- Código do item -->
+        <td class="bg-blue-50/30"><input type="number" class="table-input val-previsto text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Quantidade prevista -->
+        <td class="bg-blue-50/30"><input type="number" class="table-input val-realizado text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Quantidade realizada -->
         <td><input type="number" class="table-input text-red-600 res-falta text-center" value="0" readonly></td> <!-- Faltas (calculada) -->
         <td><input type="number" class="table-input text-green-600 res-sobra text-center" value="0" readonly></td> <!-- Sobras (calculada) -->
-        <td><input type="number" class="table-input val-avaria text-center" value="0" min="0" step="1" oninput="audit(this)" required></td> <!-- Avarias -->
-        <td><input type="number" class="table-input val-scrap text-center" value="0" min="0" step="1" oninput="audit(this)" required></td> <!-- Scrap -->
-        <td><input type="number" class="table-input val-avint text-center" value="0" min="0" step="1" oninput="audit(this)" required></td> <!-- Avarias internas -->
+        <td><input type="number" class="table-input val-avaria text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Avarias -->
+        <td><input type="number" class="table-input val-scrap text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Scrap -->
+        <td><input type="number" class="table-input val-avint text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Avarias internas -->
         <td class="bg-slate-100"><input type="number" class="table-input font-black res-bons text-center" value="0" readonly></td> <!-- Total bons (calculada) -->
         <td class="text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); auditAll();" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td> <!-- Botão remover -->
     `;
     // Adiciona a linha ao corpo da tabela
     tbody.appendChild(tr);
+    const firstInput = tr.querySelector('input[type="text"]');
+    if (firstInput) firstInput.focus();
 }
 
 function addPalletRow(bodyId) {
@@ -231,11 +250,25 @@ function audit(el) {
     // Seleciona a linha do elemento
     const row = el.parentElement.parentElement;
     // Obtém os valores dos inputs
-    const prev = parseFloat(row.querySelector('.val-previsto').value) || 0; // Previsto
-    const real = parseFloat(row.querySelector('.val-realizado').value) || 0; // Realizado
-    const av = parseFloat(row.querySelector('.val-avaria').value) || 0; // Avarias
-    const sc = parseFloat(row.querySelector('.val-scrap').value) || 0; // Scrap
-    const ai = parseFloat(row.querySelector('.val-avint').value) || 0; // Avarias internas
+    const prevInput = row.querySelector('.val-previsto');
+    const realInput = row.querySelector('.val-realizado');
+    const avInput = row.querySelector('.val-avaria');
+    const scInput = row.querySelector('.val-scrap');
+    const aiInput = row.querySelector('.val-avint');
+
+    const prev = prevInput && prevInput.value.trim() !== '' ? parseFloat(prevInput.value) || 0 : null;
+    const real = realInput && realInput.value.trim() !== '' ? parseFloat(realInput.value) || 0 : null;
+    const av = avInput && avInput.value.trim() !== '' ? parseFloat(avInput.value) || 0 : 0;
+    const sc = scInput && scInput.value.trim() !== '' ? parseFloat(scInput.value) || 0 : 0;
+    const ai = aiInput && aiInput.value.trim() !== '' ? parseFloat(aiInput.value) || 0 : 0;
+
+    if (prev === null || real === null) {
+        row.querySelector('.res-falta').value = 0;
+        row.querySelector('.res-sobra').value = 0;
+        row.querySelector('.res-bons').value = 0;
+        auditAll();
+        return;
+    }
 
     // Calcula a diferença (positivo = sobra, negativo = falta)
     const diff = real - prev;
@@ -243,9 +276,10 @@ function audit(el) {
     row.querySelector('.res-falta').value = diff < 0 ? Math.abs(diff) : 0;
     // Define o valor de sobras (se positivo) - não são contabilizadas nos bons
     row.querySelector('.res-sobra').value = diff > 0 ? diff : 0;
-    // Calcula total de itens bons: PREVISTO menos as perdas (avarias, scrap, av.int.)
-    // As sobras NÃO são descontadas, pois não eram esperadas e serão contabilizadas em nota fiscal
-    row.querySelector('.res-bons').value = prev - (av + sc + ai);
+    // Calcula total de itens bons: REALIZADO menos as perdas (avarias, scrap, av.int.)
+    // Sobras não afetam o total bons, apenas faltas e perdas.
+    const bons = real - (av + sc + ai);
+    row.querySelector('.res-bons').value = bons > 0 ? bons : 0;
     // Atualiza os totais gerais
     auditAll();
 }
@@ -272,50 +306,6 @@ function numericOnly(el) {
     el.value = el.value.replace(/\D+/g, '');
 }
 
-function togglePalletSections() {
-    const flow = document.getElementById('operationTypeSelect').value;
-    const inboundBox = document.getElementById('palletsInboundBox');
-    const outboundBox = document.getElementById('palletsOutboundBox');
-    const inboundSection = document.getElementById('inboundPalletSection');
-    const outboundSection = document.getElementById('outboundPalletSection');
-    const inboundInput = document.getElementById('palletsInboundInput');
-    const outboundInput = document.getElementById('palletsOutboundInput');
-
-    const setContainerDisabled = (container, disabled) => {
-        if (!container) return;
-        container.querySelectorAll('input, select, textarea').forEach(el => {
-            el.disabled = disabled;
-            if (disabled) {
-                el.required = false;
-            }
-        });
-    };
-
-    if (flow === 'INBOUND') {
-        inboundBox.style.display = 'block';
-        inboundSection.style.display = 'block';
-        outboundBox.style.display = 'none';
-        outboundSection.style.display = 'none';
-        inboundInput.required = true;
-        outboundInput.required = false;
-        setContainerDisabled(outboundSection, true);
-        setContainerDisabled(outboundBox, true);
-        setContainerDisabled(inboundSection, false);
-        setContainerDisabled(inboundBox, false);
-    } else {
-        inboundBox.style.display = 'none';
-        inboundSection.style.display = 'none';
-        outboundBox.style.display = 'block';
-        outboundSection.style.display = 'block';
-        inboundInput.required = false;
-        outboundInput.required = true;
-        setContainerDisabled(inboundSection, true);
-        setContainerDisabled(inboundBox, true);
-        setContainerDisabled(outboundSection, false);
-        setContainerDisabled(outboundBox, false);
-    }
-}
-
 function validateChecklist() {
     const form = document.getElementById('mainChecklist');
     if (!form.checkValidity()) {
@@ -323,10 +313,9 @@ function validateChecklist() {
         return false;
     }
 
-    const operationType = document.getElementById('operationTypeSelect').value;
     const rows = document.querySelectorAll('#itemTableBody tr');
     if (rows.length === 0) {
-        alert('Adicione pelo menos um item na conferência técnica.');
+        showFormAlert('error', 'Adicione pelo menos um item na conferência técnica.');
         return false;
     }
 
@@ -334,80 +323,41 @@ function validateChecklist() {
         const description = row.querySelector('input[type="text"]');
         const code = row.querySelector('.val-item-code');
         if (!description || !description.value.trim()) {
-            alert('Preencha a descrição de todos os itens da conferência técnica.');
+            showFormAlert('error', 'Preencha a descrição de todos os itens da conferência técnica.');
             return false;
         }
         if (!code || code.value.trim() === '') {
-            alert('Preencha o código numérico de todos os itens da conferência técnica.');
+            showFormAlert('error', 'Preencha o código numérico de todos os itens da conferência técnica.');
             return false;
         }
         const numbers = row.querySelectorAll('input[type="number"]');
         for (const input of numbers) {
             if (input.required && input.value.trim() === '') {
-                alert('Preencha todos os campos numéricos da conferência técnica.');
+                showFormAlert('error', 'Preencha todos os campos numéricos da conferência técnica.');
                 return false;
             }
             if (input.value.trim() !== '' && Number.isNaN(Number(input.value))) {
-                alert('Use apenas números nos campos numéricos da conferência técnica.');
+                showFormAlert('error', 'Use apenas números nos campos numéricos da conferência técnica.');
                 return false;
             }
         }
     }
 
-    const activePalletInput = operationType === 'INBOUND'
-        ? document.getElementById('palletsInboundInput')
-        : document.getElementById('palletsOutboundInput');
-    if (!activePalletInput.value.trim()) {
-        alert('Preencha o campo de pallets correspondente ao fluxo selecionado.');
+    const totalPbrInput = document.getElementById('totalPbrInput');
+    const fardosPorPalletInput = document.getElementById('fardosPorPalletInput');
+    if (!totalPbrInput || totalPbrInput.value.trim() === '' || Number.isNaN(Number(totalPbrInput.value))) {
+        showFormAlert('error', 'Preencha o total de pallets utilizados com um número válido.');
         return false;
     }
-
-    const palletBodyId = operationType === 'INBOUND' ? 'inboundPalletBody' : 'outboundPalletBody';
-    if (!validatePalletSection(palletBodyId)) {
+    if (!fardosPorPalletInput || fardosPorPalletInput.value.trim() === '' || Number.isNaN(Number(fardosPorPalletInput.value))) {
+        showFormAlert('error', 'Preencha a quantidade de fardos por pallet com um número válido.');
         return false;
     }
 
     const driverCanvas = document.getElementById('driverSignatureCanvas');
     const checkerCanvas = document.getElementById('checkerSignatureCanvas');
     if (isCanvasBlank(driverCanvas) || isCanvasBlank(checkerCanvas)) {
-        alert('Por favor, assine no quadro do motorista e do conferente antes de finalizar.');
-        return false;
-    }
-
-    return true;
-}
-
-function validatePalletSection(bodyId) {
-    const rows = document.querySelectorAll(`#${bodyId} tr`);
-    let hasFilledRow = false;
-
-    for (const row of rows) {
-        const code = row.querySelector('.val-pallet-code');
-        const count = row.querySelector('.val-pallet-count');
-        const per = row.querySelector('.val-pallet-per');
-
-        const codeValue = code?.value.trim() || '';
-        const countValue = count?.value.trim() || '';
-        const perValue = per?.value.trim() || '';
-        const anyFilled = codeValue !== '' || countValue !== '' || perValue !== '';
-
-        if (!anyFilled) {
-            continue;
-        }
-
-        hasFilledRow = true;
-        if (codeValue === '' || countValue === '' || perValue === '') {
-            alert('Preencha todos os campos da linha de pallet ou deixe-a completamente vazia.');
-            return false;
-        }
-        if (Number.isNaN(Number(codeValue)) || Number.isNaN(Number(countValue)) || Number.isNaN(Number(perValue))) {
-            alert('Use apenas números nos campos de pallet.');
-            return false;
-        }
-    }
-
-    if (!hasFilledRow) {
-        alert('Adicione pelo menos um código de pallet no fluxo ativo ou zere o campo de pallets.');
+        showFormAlert('error', 'Por favor, assine no quadro do motorista e do conferente antes de finalizar.');
         return false;
     }
 
@@ -418,12 +368,6 @@ function validatePalletSection(bodyId) {
 // Adiciona uma linha inicial de item ao carregar a página
 addItemRow();
 
-const operationTypeSelect = document.getElementById('operationTypeSelect');
-if (operationTypeSelect) {
-    operationTypeSelect.addEventListener('change', togglePalletSections);
-}
-
-togglePalletSections();
 initSignatureCanvas('driverSignatureCanvas');
 initSignatureCanvas('checkerSignatureCanvas');
 
@@ -436,8 +380,9 @@ document.addEventListener('DOMContentLoaded', () => {
 async function saveChecklist(event) {
     event.preventDefault();
 
+    clearFormAlert();
     if (!secureInputValidation()) {
-        alert('Erro de validação de segurança. Verifique os dados inseridos.');
+        showFormAlert('error', 'Erro de validação de segurança. Verifique os dados inseridos.');
         return;
     }
 
@@ -456,9 +401,11 @@ async function saveChecklist(event) {
         placaCarreta2: document.getElementById('placaCarreta2Input')?.value || '',
         transportadora: document.getElementById('transportadoraInput')?.value || '',
         doca: document.getElementById('docaInput')?.value || '',
-        palletsInbound: document.getElementById('palletsInboundInput')?.value || '0',
-        palletsOutbound: document.getElementById('palletsOutboundInput')?.value || '0',
+        palletsInbound: '0',
+        palletsOutbound: '0',
         totalPbr: document.getElementById('totalPbrInput')?.value || '0',
+        fardosPorPallet: document.getElementById('fardosPorPalletInput')?.value || '0',
+        hygieneNote: document.getElementById('hygieneObservation')?.value || '',
         lacre1: document.getElementById('lacre1Input')?.value || '',
         lacre2: document.getElementById('lacre2Input')?.value || '',
         statusLacre: document.getElementById('statusLacreSelect')?.value || '',
@@ -468,7 +415,7 @@ async function saveChecklist(event) {
         totalFaltas: parseInt(document.getElementById('totalFaltas')?.innerText) || 0,
         totalSobra: parseInt(document.getElementById('totalSobra')?.innerText) || 0,
         totalBonsGeral: parseInt(document.getElementById('totalBonsGeral')?.innerText) || 0,
-        observations: document.querySelector('textarea')?.value || '',
+        observations: document.getElementById('cargoObservations')?.value || '',
         driverSignature: getSignatureData(document.getElementById('driverSignatureCanvas')),
         checkerSignature: getSignatureData(document.getElementById('checkerSignatureCanvas'))
     };
@@ -501,20 +448,14 @@ async function saveChecklist(event) {
     checklistData.avariados = checklistData.items.reduce((sum, item) => sum + item.avarias, 0);
     checklistData.scrap = checklistData.items.reduce((sum, item) => sum + item.scrap, 0);
     checklistData.avariasInternas = checklistData.items.reduce((sum, item) => sum + item.avariasInternas, 0);
+    checklistData.palletRows = [];
 
-    const palletBodyId = operationType === 'INBOUND' ? 'inboundPalletBody' : 'outboundPalletBody';
-    checklistData.palletRows = Array.from(document.querySelectorAll(`#${palletBodyId} tr`))
-        .map(row => {
-            const code = row.querySelector('.val-pallet-code')?.value.trim() || '';
-            const count = row.querySelector('.val-pallet-count')?.value.trim() || '';
-            const per = row.querySelector('.val-pallet-per')?.value.trim() || '';
-            return {
-                code: sanitizeText(code),
-                count: parseInt(sanitizeNumber(count), 10) || 0,
-                per: parseInt(sanitizeNumber(per), 10) || 0
-            };
-        })
-        .filter(row => row.code !== '' || row.count !== 0 || row.per !== 0);
+    const submitButton = document.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+        submitButton.innerText = 'Enviando...';
+    }
 
     try {
         if (!window.firebaseDb || !window.firebaseAddDoc || !window.firebaseCollection) {
@@ -529,16 +470,24 @@ async function saveChecklist(event) {
             }
         );
 
-        alert('Checklist enviado para o painel admin com sucesso!');
+        showFormAlert('success', 'Checklist enviado para o painel admin com sucesso!');
         document.getElementById('mainChecklist').reset();
+        clearSignature('driverSignatureCanvas');
+        clearSignature('checkerSignatureCanvas');
+        auditAll();
     } catch (error) {
         console.error('Erro ao enviar dados para o painel:', error);
-        alert('Erro ao enviar o relatório para o painel admin. Verifique a conexão e tente novamente.');
+        showFormAlert('error', 'Erro ao enviar o relatório para o painel admin. Verifique a conexão e tente novamente.');
+    } finally {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+            submitButton.innerText = 'Finalizar Checklist Operacional';
+        }
     }
 }
 
 
 // ===== CONFIGURAÇÃO DO EVENT LISTENER =====
 
-// Adiciona event listener para o formulário
-document.getElementById('mainChecklist').addEventListener('submit', saveChecklist);
+// O formulário já chama saveChecklist() via onsubmit no HTML.

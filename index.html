@@ -47,6 +47,7 @@
             <!-- ===== FORMULÁRIO PRINCIPAL ===== -->
             <!-- Formulário que contém todas as seções do checklist -->
             <form id="mainChecklist" onsubmit="event.preventDefault(); saveChecklist(event);">
+            <div id="formAlert" class="form-alert hidden" role="alert"></div>
 
             <!-- ===== SEÇÃO 1: IDENTIFICAÇÃO GERAL ===== -->
             <!-- Campos para informações básicas da operação -->
@@ -115,6 +116,10 @@
                     <h2 class="text-black font-bold uppercase">Higiene e Estrutura</h2> <!-- Título da seção -->
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="hygieneGrid"></div> <!-- Container para os critérios -->
+                <div class="mt-6">
+                    <label for="hygieneObservation" class="text-[10px] font-bold text-black uppercase block mb-2">Observação de Higiene e Estrutura</label>
+                    <textarea id="hygieneObservation" class="w-full min-h-[90px] bg-white border border-muted rounded-2xl p-4 text-xs font-semibold outline-none focus-ring-dhl-red" placeholder="Registre observações importantes sobre higiene, limpeza e condição estrutural."></textarea>
+                </div>
             </section>
 
             <!-- ===== SEÇÃO 3: CONFERÊNCIA TÉCNICA DE ITENS ===== -->
@@ -168,86 +173,19 @@
             </section>
 
             <!-- ===== SEÇÃO 4: CONTROLE DE PALETES ===== -->
-            <!-- Controle de pallets para operações inbound/outbound -->
             <section class="glass-card p-8">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">04</span> <!-- Número da seção -->
-                    <h2 class="text-black font-bold uppercase">Controle de Paletes (PBR)</h2> <!-- Título da seção -->
+                    <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">04</span>
+                    <h2 class="text-black font-bold uppercase">Controle de Paletes (PBR)</h2>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Campo Pallets OUTBOUND -->
-                    <div id="palletsOutboundBox" class="bg-panel p-4 rounded-xl border border-muted">
-                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Pallets OUTBOUND</label>
-                        <input id="palletsOutboundInput" type="number" class="input-field font-black text-center" value="0" placeholder="30" min="0" step="1" required>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+                    <div class="bg-panel p-4 rounded-xl border border-muted">
+                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Total de Paletes Utilizados</label>
+                        <input id="totalPbrInput" type="number" class="input-field font-black text-center" value="0" placeholder="0" min="0" step="1" required>
                     </div>
-                    <!-- Campo Pallets INBOUND -->
-                    <div id="palletsInboundBox" class="bg-panel p-4 rounded-xl border border-muted">
-                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Pallets INBOUND</label>
-                        <input id="palletsInboundInput" type="number" class="input-field font-black text-center" value="0" placeholder="30" min="0" step="1" required>
-                    </div>
-                    <!-- Campo Total PBR Utilizados -->
-                    <div id="palletsTotalBox" class="bg-panel p-4 rounded-xl border border-muted">
-                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Total PBR Utilizados</label>
-                        <input id="totalPbrInput" type="number" class="input-field font-black text-center" value="0" placeholder="30" min="0" step="1" required>
-                    </div>
-                </div>
-
-                <!-- ===== SUBSEÇÃO EMBARQUE (OUT) ===== -->
-                <div id="outboundPalletSection" class="mb-8">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-[10px] font-bold text-black uppercase">Embarque (OUT)</p>
-                        <button type="button" onclick="addPalletRow('outboundPalletBody')" class="text-xs font-black uppercase px-4 py-2 border rounded-lg">Adicionar código</button>
-                    </div>
-                    <div class="table-container overflow-x-auto w-full">
-                        <table class="min-w-full w-full">
-                            <thead class="bg-panel border-b">
-                                <tr>
-                                    <th class="text-left pl-4 py-3">Código do Item</th> <!-- Código do item -->
-                                    <th class="text-right pr-4 py-3">Fardos Totais</th> <!-- Total de fardos -->
-                                    <th class="text-right pr-4 py-3">Fardos / Pallet</th> <!-- Fardos por pallet -->
-                                    <th class="w-16"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="outboundPalletBody">
-                                <!-- Linha de exemplo para embarque -->
-                                <tr class="border-b border-muted">
-                                    <td class="py-3 pl-4"><input type="number" class="input-field val-pallet-code text-right" placeholder="1" min="0" step="1" oninput="numericOnly(this)"></td>
-                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-count text-right" placeholder="10" min="0" step="1" oninput="numericOnly(this)"></td>
-                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-per text-right" placeholder="2" min="0" step="1" oninput="numericOnly(this)"></td>
-                                    <td class="text-center"><button type="button" onclick="removePalletRow(this)" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- ===== SUBSEÇÃO DESCARREGAMENTO ===== -->
-                <div id="inboundPalletSection">
-                    <div class="flex items-center justify-between mb-3">
-                        <p class="text-[10px] font-bold text-black uppercase">Descarregamento (IN)</p>
-                        <button type="button" onclick="addPalletRow('inboundPalletBody')" class="text-xs font-black uppercase px-4 py-2 border rounded-lg">Adicionar código</button>
-                    </div>
-                    <div class="table-container overflow-x-auto w-full">
-                        <table class="min-w-full w-full">
-                            <thead class="bg-panel border-b">
-                                <tr>
-                                    <th class="text-left pl-4 py-3">Código do Item</th> <!-- Código do item -->
-                                    <th class="text-right pr-4 py-3">Fardos Totais</th> <!-- Total de fardos -->
-                                    <th class="text-right pr-4 py-3">Fardos / Pallet</th> <!-- Fardos por pallet -->
-                                    <th class="w-16"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="inboundPalletBody">
-                                <!-- Linha de exemplo para descarregamento -->
-                                <tr class="border-b border-muted">
-                                    <td class="py-3 pl-4"><input type="number" class="input-field val-pallet-code text-right" placeholder="1" min="0" step="1" oninput="numericOnly(this)"></td>
-                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-count text-right" placeholder="0" min="0" step="1" oninput="numericOnly(this)"></td>
-                                    <td class="py-3 pr-4"><input type="number" class="input-field val-pallet-per text-right" placeholder="0" min="0" step="1" oninput="numericOnly(this)"></td>
-                                    <td class="text-center"><button type="button" onclick="removePalletRow(this)" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="bg-panel p-4 rounded-xl border border-muted">
+                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Fardos por Pallet</label>
+                        <input id="fardosPorPalletInput" type="number" class="input-field font-black text-center" value="0" placeholder="0" min="0" step="1" required>
                     </div>
                 </div>
             </section>
@@ -259,7 +197,7 @@
                     <span class="w-8 h-8 dhl-red text-white flex items-center justify-center rounded-lg font-black">05</span> <!-- Número da seção -->
                     <h2 class="text-black font-bold uppercase">Observações da Carga</h2> <!-- Título da seção -->
                 </div>
-                <textarea class="w-full h-[80px] bg-white border border-black rounded-xl p-4 text-xs font-semibold outline-none focus-ring-dhl-red" placeholder="Lote, detalhes de avaria, etc..."></textarea> <!-- Campo de texto -->
+                <textarea id="cargoObservations" class="w-full h-[80px] bg-white border border-black rounded-xl p-4 text-xs font-semibold outline-none focus-ring-dhl-red" placeholder="Lote, detalhes de avaria, etc..."></textarea> <!-- Campo de texto -->
             </section>
 
             <!-- ===== SEÇÃO 6: LACRES E ASSINATURAS ===== -->

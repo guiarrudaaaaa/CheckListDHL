@@ -171,10 +171,48 @@ body {
     font-weight: 700; /* Peso bold */
     font-size: 12px; /* Tamanho pequeno */
     color: var(--dhl-black); /* Cor preta */
+    min-width: 80px;
 }
 
 .table-input:focus {
     border-color: var(--dhl-red); /* Borda vermelha no foco */
+}
+
+.form-alert {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid transparent;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+}
+
+.form-alert-icon {
+    display: inline-grid;
+    place-items: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.form-alert-error {
+    background: rgba(212, 5, 17, 0.12);
+    border-color: rgba(212, 5, 17, 0.25);
+    color: var(--dhl-red);
+}
+
+.form-alert-success {
+    background: rgba(0, 100, 67, 0.12);
+    border-color: rgba(0, 100, 67, 0.28);
+    color: var(--dhl-dark-green);
 }
 
 /* ===== UTILITÁRIOS GERAIS ===== */
@@ -324,6 +362,7 @@ body {
     .table-container th,
     .table-container td {
         white-space: nowrap;
+        min-width: 90px;
     }
     
     .data-table {

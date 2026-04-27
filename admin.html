@@ -30,7 +30,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-6 py-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <div class="metric-card red">
                 <p class="metric-label">📋 Total de Registros</p>
                 <p class="metric-value" id="totalRegistros">0</p>
@@ -46,6 +46,10 @@
             <div class="metric-card green">
                 <p class="metric-label">📤 Operações Outbound</p>
                 <p class="metric-value" id="outboundCount">0</p>
+            </div>
+            <div class="metric-card purple">
+                <p class="metric-label">📦 Total Pallets</p>
+                <p class="metric-value" id="totalPbrCount">0</p>
             </div>
         </div>
 
@@ -68,11 +72,6 @@
                     <span>📤 Outbound</span> <span id="outboundNumber" class="ml-2 font-bold">(0)</span>
                 </button>
             </div>
-        </div>
-
-        <div id="relatorio" class="bg-white rounded-lg p-6 mb-8 shadow-sm">
-            <h2 class="text-xl font-bold mb-4">Relatório de Check-ins</h2>
-            <ul id="lista-nomes" class="space-y-2 text-sm text-slate-700"></ul>
         </div>
 
         <div class="table-container">

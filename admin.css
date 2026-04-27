@@ -540,8 +540,48 @@ td.text-bold { font-weight: 700; text-transform: uppercase; } /* Texto bold mai√
 
 .metric-card.red { border-top: 4px solid var(--dhl-red); } /* Borda superior vermelha */
 .metric-card.yellow { border-top: 4px solid var(--dhl-yellow); } /* Borda superior amarela */
-.metric-card.blue { border-top: 4px solid var(--dhl-red); } /* Borda superior vermelha */
+.metric-card.blue { border-top: 4px solid #2563eb; } /* Borda superior azul */
 .metric-card.green { border-top: 4px solid var(--dhl-dark-green); } /* Borda superior verde */
+.metric-card.purple { border-top: 4px solid #7c3aed; } /* Borda superior roxa */
+
+.checkin-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.checkin-item-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.checkin-item-type {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--dhl-black);
+    text-transform: uppercase;
+}
+
+.checkin-item-time {
+    font-size: 0.85rem;
+    color: #61748b;
+}
+
+.checkin-item-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+    color: #334155;
+}
 
 .metric-label {
     font-size: 0.8rem; /* Tamanho pequeno */
@@ -617,9 +657,6 @@ td.text-bold { font-weight: 700; text-transform: uppercase; } /* Texto bold mai√
 
 .btn-logout { background: var(--dhl-black); color: var(--dhl-white); padding: 0.6rem 1rem; border-radius: 9999px; font-weight: 600; transition: background-color 0.2s ease; } /* Bot√£o logout */
 .btn-logout:hover { background: #b90112; } /* Hover do bot√£o logout */
-    font-weight: 800;
-    color: var(--dhl-black);
-}
 
 .navbar-page-subtitle {
     font-size: 0.75rem;

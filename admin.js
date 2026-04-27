@@ -51,10 +51,21 @@ async function carregarRelatorio() {
         const lista = document.getElementById('lista-nomes');
         if (lista) {
             lista.innerHTML = '';
-            // 🔥 OTIMIZAÇÃO: Limita lista lateral a 20 itens
+            // 🔥 OTIMIZAÇÃO: Limita lista a 20 entradas recentes
             allChecklists.slice(0, 20).forEach(item => {
                 const li = document.createElement('li');
-                li.innerText = `${item.checkinTime || ''} - ${formatValue(item.driverName)}`;
+                li.className = 'checkin-item';
+                li.innerHTML = `
+                    <div class="checkin-item-top">
+                        <span class="checkin-item-type">${item.operationType === 'IN' ? '📥 INBOUND' : '📤 OUTBOUND'}</span>
+                        <span class="checkin-item-time">${formatValue(item.checkinTime)}</span>
+                    </div>
+                    <div class="checkin-item-body">
+                        <strong>${formatValue(item.driverName)}</strong>
+                        <span>${formatValue(item.dtNumber)}</span>
+                        <span>${formatValue(item.placaCavalo)}</span>
+                    </div>
+                `;
                 lista.appendChild(li);
             });
         }
@@ -117,6 +128,8 @@ function updateMetrics() {
     const outCount = allChecklists.filter(c => String(c.operationType || '').toUpperCase() === 'OUT').length;
     // Conta docas únicas em uso (remove duplicatas)
     const totalDoca = new Set(allChecklists.filter(c => c.doca && c.doca !== '').map(c => String(c.doca).toUpperCase())).size;
+    // Total de pallets usados em todos os checklists
+    const totalPbr = allChecklists.reduce((sum, item) => sum + (parseInt(item.totalPbr || item.totalPBR || 0, 10) || 0), 0);
     // Total de registros
     const totalRegistros = allChecklists.length;
 
@@ -125,6 +138,7 @@ function updateMetrics() {
     document.getElementById('totalDocas').textContent = totalDoca;
     document.getElementById('inboundCount').textContent = inCount;
     document.getElementById('outboundCount').textContent = outCount;
+    document.getElementById('totalPbrCount').textContent = totalPbr;
 
     // Atualiza os contadores nas abas de filtro
     document.getElementById('todosNumber').textContent = `(${totalRegistros})`;
@@ -255,6 +269,12 @@ function viewChecklistDetails(index) {
     const checklist = allChecklists[index];
     if (!checklist) return;
 
+    const totalPallets = Number.isFinite(Number(checklist.totalPbr || checklist.totalPBR))
+        ? Number(checklist.totalPbr || checklist.totalPBR)
+        : (Array.isArray(checklist.palletRows)
+            ? checklist.palletRows.reduce((sum, row) => sum + (parseInt(row.quantity || row.qtd || 0, 10) || 0), 0)
+            : 0);
+
     // Cria modal com detalhes completos
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
@@ -333,7 +353,7 @@ function viewChecklistDetails(index) {
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+<div class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                         <div class="bg-white p-2 rounded border text-center">
                             <strong>Total Faltas:</strong> <span class="text-red-600">${checklist.totalFaltas || 0}</span>
                         </div>
@@ -345,6 +365,9 @@ function viewChecklistDetails(index) {
                         </div>
                         <div class="bg-white p-2 rounded border text-center">
                             <strong>Total Fardos:</strong> <span class="font-bold">${checklist.totalFardos || 0}</span>
+                        </div>
+                        <div class="bg-white p-2 rounded border text-center">
+                            <strong>Total Pallets:</strong> <span class="font-bold">${totalPallets}</span>
                         </div>
                     </div>
                 </div>

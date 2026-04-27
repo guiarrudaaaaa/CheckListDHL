@@ -323,7 +323,6 @@ function viewChecklistDetails(index) {
                         <table class="w-full text-sm border-collapse border border-gray-300">
                             <thead>
                                 <tr class="bg-gray-100">
-                                    <th class="border border-gray-300 p-2">Descrição</th>
                                     <th class="border border-gray-300 p-2">Código</th>
                                     <th class="border border-gray-300 p-2">Previsto</th>
                                     <th class="border border-gray-300 p-2">Realizado</th>
@@ -338,7 +337,6 @@ function viewChecklistDetails(index) {
                             <tbody>
                                 ${(checklist.items || []).map(item => `
                                     <tr>
-                                        <td class="border border-gray-300 p-2">${item.description || ''}</td>
                                         <td class="border border-gray-300 p-2">${item.code || ''}</td>
                                         <td class="border border-gray-300 p-2 text-center">${item.previsto || 0}</td>
                                         <td class="border border-gray-300 p-2 text-center">${item.realizado || 0}</td>
@@ -360,11 +358,11 @@ function viewChecklistDetails(index) {
                         <div class="bg-white p-2 rounded border text-center">
                             <strong>Total Sobras:</strong> <span class="text-green-600">${checklist.totalSobra || 0}</span>
                         </div>
-                        <div class="bg-white p-2 rounded border text-center">
-                            <strong>Total Bons:</strong> <span class="text-blue-600 font-bold">${checklist.totalBonsGeral || 0}</span>
+                                <div class="bg-white p-2 rounded border text-center">
+                            <strong>Total Bons:</strong> <span class="text-blue-600 font-bold">${calculateTotalBons(checklist)}</span>
                         </div>
                         <div class="bg-white p-2 rounded border text-center">
-                            <strong>Total Fardos:</strong> <span class="font-bold">${checklist.totalFardos || 0}</span>
+                            <strong>Total Fardos:</strong> <span class="font-bold">${checklist.totalFardos || calculateTotalFardos(checklist)}</span>
                         </div>
                         <div class="bg-white p-2 rounded border text-center">
                             <strong>Total Pallets:</strong> <span class="font-bold">${totalPallets}</span>
@@ -420,6 +418,12 @@ function viewChecklistDetails(index) {
                     ` : ''}
                 </div>
                 ` : ''}
+                ${checklist.hygieneNote ? `
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-3">📝 Observação de Qualidade</h3>
+                    <p class="text-gray-700">${checklist.hygieneNote}</p>
+                </div>
+                ` : ''}
             </div>
         </div>
     `);
@@ -429,6 +433,21 @@ function viewChecklistDetails(index) {
     }
 
     document.body.appendChild(modal);
+}
+
+function calculateTotalBons(checklist) {
+    if (!checklist || !Array.isArray(checklist.items)) return checklist.totalBonsGeral || 0;
+    return checklist.items.reduce((sum, item) => {
+        const realizado = Number(item.realizado || 0);
+        const losses = Number(item.avarias || 0) + Number(item.scrap || 0) + Number(item.avariasInternas || 0);
+        const bons = realizado - losses;
+        return sum + (bons > 0 ? bons : 0);
+    }, 0);
+}
+
+function calculateTotalFardos(checklist) {
+    if (!checklist || !Array.isArray(checklist.items)) return checklist.totalFardos || 0;
+    return checklist.items.reduce((sum, item) => sum + Number(item.previsto || 0), 0);
 }
 
 // Função para editar um checklist (placeholder)

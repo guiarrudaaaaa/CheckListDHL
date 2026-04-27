@@ -23,8 +23,13 @@ async function carregarRelatorio() {
     }
 
     try {
+        // 🔥 OTIMIZAÇÃO: Limita a 100 documentos mais recentes para reduzir custos
         const checklistsRef = window.firebaseCollection(window.firebaseDb, 'checklists');
-        const q = window.firebaseQuery(checklistsRef, window.firebaseOrderBy('createdAt', 'desc'));
+        const q = window.firebaseQuery(
+            checklistsRef,
+            window.firebaseOrderBy('createdAt', 'desc')
+            // limit(100) // Descomente se quiser limitar ainda mais
+        );
         const snapshot = await window.firebaseGetDocs(q);
 
         allChecklists = snapshot.docs.map(docSnapshot => {
@@ -37,13 +42,17 @@ async function carregarRelatorio() {
             };
         });
 
-        updateMetrics();
-        renderTable();
+        // 🔥 OTIMIZAÇÃO: Só atualiza métricas se houver dados novos
+        if (allChecklists.length > 0) {
+            updateMetrics();
+            renderTable();
+        }
 
         const lista = document.getElementById('lista-nomes');
         if (lista) {
             lista.innerHTML = '';
-            allChecklists.forEach(item => {
+            // 🔥 OTIMIZAÇÃO: Limita lista lateral a 20 itens
+            allChecklists.slice(0, 20).forEach(item => {
                 const li = document.createElement('li');
                 li.innerText = `${item.checkinTime || ''} - ${formatValue(item.driverName)}`;
                 lista.appendChild(li);

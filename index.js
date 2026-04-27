@@ -146,7 +146,7 @@ function showFormAlert(type, message) {
     alertBox.className = 'form-alert';
     alertBox.classList.add(type === 'success' ? 'form-alert-success' : 'form-alert-error');
     alertBox.innerHTML = '<span class="form-alert-icon">' + (type === 'success' ? '✓' : '!') + '</span><span>' + message + '</span>';
-    alertBox.classList.remove('hidden');
+    alertBox.classList.remove('hidden', 'form-alert-hidden');
     alertBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -410,7 +410,7 @@ async function saveChecklist(event) {
         palletsInbound: '0',
         palletsOutbound: '0',
         totalPbr: document.getElementById('totalPbrInput')?.value || '0',
-        hygieneNote: document.getElementById('hygieneObservation')?.value || '',
+        hygieneNote: document.getElementById('hygieneObservation')?.value.trim() || '',
         lacre1: document.getElementById('lacre1Input')?.value || '',
         lacre2: document.getElementById('lacre2Input')?.value || '',
         statusLacre: document.getElementById('statusLacreSelect')?.value || '',

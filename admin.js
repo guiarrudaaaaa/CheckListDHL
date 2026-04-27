@@ -284,6 +284,8 @@ function viewChecklistDetails(index) {
             ? checklist.palletRows.reduce((sum, row) => sum + (parseInt(row.quantity || row.qtd || 0, 10) || 0), 0)
             : 0);
 
+    const hygieneNote = (checklist.hygieneNote || checklist.hygieneObservation || checklist.hygiene_notes || checklist.hygiene_note || '').toString().trim();
+
     // Cria modal com detalhes completos
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
@@ -325,6 +327,13 @@ function viewChecklistDetails(index) {
                         ).join('')}
                     </div>
                 </div>
+
+                ${hygieneNote ? `
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-3">📝 Observação de Higiene e Estrutura</h3>
+                    <p class="text-gray-700">${hygieneNote}</p>
+                </div>
+                ` : ''}
 
                 <!-- Itens -->
                 <div class="bg-yellow-50 p-4 rounded-lg">
@@ -426,12 +435,6 @@ function viewChecklistDetails(index) {
                         </div>
                     </div>
                     ` : ''}
-                </div>
-                ` : ''}
-                ${checklist.hygieneNote ? `
-                <div class="bg-purple-50 p-4 rounded-lg">
-                    <h3 class="font-bold text-lg mb-3">📝 Observação de Qualidade</h3>
-                    <p class="text-gray-700">${checklist.hygieneNote}</p>
                 </div>
                 ` : ''}
             </div>

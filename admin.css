@@ -618,6 +618,73 @@ td.text-bold { font-weight: 700; text-transform: uppercase; } /* Texto bold mai√
     box-shadow: 0 0 0 3px rgba(212, 5, 17, 0.1); /* Sombra de foco */
 }
 
+@media (max-width: 1024px) {
+    .navbar-fullwidth-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .navbar-left,
+    .navbar-right,
+    .navbar-center {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .navbar-left,
+    .navbar-right {
+        min-width: auto;
+        margin: 0.35rem 0;
+    }
+
+    .navbar-center {
+        order: -1;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .filter-tab {
+        flex: 1 1 auto;
+        min-width: 140px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .navbar-fullwidth-container {
+        gap: 0.75rem;
+        padding: 0.75rem 0.5rem;
+    }
+
+    .brand-logo {
+        width: 120px;
+    }
+
+    .brand-logo-suzano {
+        width: 80px;
+        margin-left: 0.5rem;
+    }
+
+    .metric-card {
+        padding: 1.25rem;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 /* ===== ESTADO VAZIO ===== */
 /* Estilos para estado vazio */
 .empty-state {

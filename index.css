@@ -152,7 +152,8 @@ body {
 
 /* ===== TABELAS ===== */
 /* Configurações para tabelas fixas */
-.table-fixed-cols { table-layout: fixed; width: 100%; } /* Layout fixo */
+.table-fixed-cols { table-layout: fixed; width: 100%; margin: 0 auto; } /* Layout fixo */
+.table-fixed-cols th, .table-fixed-cols td { text-align: center; }
 .col-desc { width: 22%; } /* Largura da coluna descrição */
 .col-code { width: 10%; } /* Largura da coluna código */
 .col-num { width: 8%; } /* Largura das colunas numéricas */
@@ -217,6 +218,8 @@ body {
 
 /* ===== UTILITÁRIOS GERAIS ===== */
 /* Classes utilitárias para cores e estilos */
+.page-shell { max-width: 1400px; margin: 0 auto; }
+#mainChecklist { max-width: 1400px; margin: 0 auto; }
 .thin-text { color: var(--dhl-black); } /* Texto fino */
 .bg-panel { background: var(--dhl-white) !important; } /* Fundo painel */
 .border-muted { border-color: var(--border-muted) !important; } /* Borda muted */

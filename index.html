@@ -73,7 +73,7 @@
                     <!-- Campo Doca: Identificação da doca -->
                     <div class="md:col-span-4">
                         <label class="text-[10px] font-bold text-black uppercase">Doca</label>
-                        <input id="docaInput" type="text" class="input-field" inputmode="numeric" pattern="\d*" required oninput="numericOnly(this)">
+                        <input id="docaInput" type="text" class="input-field uppercase" required>
                     </div>
 
                     <!-- Campo Motorista: Nome do motorista -->
@@ -137,7 +137,6 @@
                     <table class="table-fixed-cols">
                         <thead class="bg-panel border-b">
                             <tr>
-                                <th class="col-desc !text-left pl-6">Descrição</th> <!-- Coluna descrição -->
                                 <th class="col-code">Código</th> <!-- Coluna código -->
                                 <th class="col-num bg-panel">Previsto</th> <!-- Coluna quantidade prevista -->
                                 <th class="col-num bg-panel">Realizado</th> <!-- Coluna quantidade realizada -->
@@ -178,14 +177,10 @@
                     <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">04</span>
                     <h2 class="text-black font-bold uppercase">Controle de Paletes (PBR)</h2>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
+                <div class="grid grid-cols-1 gap-6 mb-2">
                     <div class="bg-panel p-4 rounded-xl border border-muted">
                         <label class="text-[10px] font-bold text-black uppercase block mb-2">Total de Paletes Utilizados</label>
                         <input id="totalPbrInput" type="number" class="input-field font-black text-center" value="0" placeholder="0" min="0" step="1" required>
-                    </div>
-                    <div class="bg-panel p-4 rounded-xl border border-muted">
-                        <label class="text-[10px] font-bold text-black uppercase block mb-2">Fardos por Pallet</label>
-                        <input id="fardosPorPalletInput" type="number" class="input-field font-black text-center" value="0" placeholder="0" min="0" step="1" required>
                     </div>
                 </div>
             </section>

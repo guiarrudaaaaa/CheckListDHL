@@ -201,21 +201,36 @@ function addItemRow() {
     tr.className = "hover:bg-slate-50";
     // Define o HTML da linha com inputs para cada coluna
     tr.innerHTML = `
-        <td class="pl-6"><input type="text" class="table-input !text-left uppercase" placeholder="Descrição do item técnico" required></td> <!-- Descrição do item -->
         <td><input type="number" class="table-input val-item-code text-center" placeholder="Cód." min="0" step="1" required></td> <!-- Código do item -->
-        <td class="bg-blue-50/30"><input type="number" class="table-input val-previsto text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Quantidade prevista -->
-        <td class="bg-blue-50/30"><input type="number" class="table-input val-realizado text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Quantidade realizada -->
+        <td class="bg-blue-50/30"><input type="number" class="table-input val-previsto text-center" value="" min="0" step="1" required></td> <!-- Quantidade prevista -->
+        <td class="bg-blue-50/30"><input type="number" class="table-input val-realizado text-center" value="" min="0" step="1" required></td> <!-- Quantidade realizada -->
         <td><input type="number" class="table-input text-red-600 res-falta text-center" value="0" readonly></td> <!-- Faltas (calculada) -->
         <td><input type="number" class="table-input text-green-600 res-sobra text-center" value="0" readonly></td> <!-- Sobras (calculada) -->
-        <td><input type="number" class="table-input val-avaria text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Avarias -->
-        <td><input type="number" class="table-input val-scrap text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Scrap -->
-        <td><input type="number" class="table-input val-avint text-center" value="" min="0" step="1" oninput="audit(this)" required></td> <!-- Avarias internas -->
+        <td><input type="number" class="table-input val-avaria text-center" value="" min="0" step="1" required></td> <!-- Avarias -->
+        <td><input type="number" class="table-input val-scrap text-center" value="" min="0" step="1" required></td> <!-- Scrap -->
+        <td><input type="number" class="table-input val-avint text-center" value="" min="0" step="1" required></td> <!-- Avarias internas -->
         <td class="bg-slate-100"><input type="number" class="table-input font-black res-bons text-center" value="0" readonly></td> <!-- Total bons (calculada) -->
-        <td class="text-center"><button type="button" onclick="this.parentElement.parentElement.remove(); auditAll();" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td> <!-- Botão remover -->
+        <td class="text-center"><button type="button" class="text-slate-300 hover:text-red-500 font-bold">✕</button></td> <!-- Botão remover -->
     `;
+
     // Adiciona a linha ao corpo da tabela
     tbody.appendChild(tr);
-    const firstInput = tr.querySelector('input[type="text"]');
+
+    const inputs = tr.querySelectorAll('.val-previsto, .val-realizado, .val-avaria, .val-scrap, .val-avint');
+    inputs.forEach(input => {
+        input.addEventListener('input', () => audit(input));
+        input.addEventListener('change', () => audit(input));
+    });
+
+    const removeButton = tr.querySelector('button');
+    if (removeButton) {
+        removeButton.addEventListener('click', () => {
+            tr.remove();
+            auditAll();
+        });
+    }
+
+    const firstInput = tr.querySelector('.val-item-code');
     if (firstInput) firstInput.focus();
 }
 
@@ -292,9 +307,9 @@ function auditAll() {
     // Soma todas as sobras
     let s = 0;
     document.querySelectorAll('.res-sobra').forEach(i => s += parseFloat(i.value) || 0);
-    // Soma todos os itens bons
+    // Soma todos os valores realizados para entrada
     let b = 0;
-    document.querySelectorAll('.res-bons').forEach(i => b += parseFloat(i.value) || 0);
+    document.querySelectorAll('.val-realizado').forEach(i => b += parseFloat(i.value) || 0);
     // Atualiza os elementos HTML com os totais
     document.getElementById('totalFaltas').innerText = f;
     document.getElementById('totalSobra').innerText = s;
@@ -320,12 +335,7 @@ function validateChecklist() {
     }
 
     for (const row of rows) {
-        const description = row.querySelector('input[type="text"]');
         const code = row.querySelector('.val-item-code');
-        if (!description || !description.value.trim()) {
-            showFormAlert('error', 'Preencha a descrição de todos os itens da conferência técnica.');
-            return false;
-        }
         if (!code || code.value.trim() === '') {
             showFormAlert('error', 'Preencha o código numérico de todos os itens da conferência técnica.');
             return false;
@@ -344,13 +354,8 @@ function validateChecklist() {
     }
 
     const totalPbrInput = document.getElementById('totalPbrInput');
-    const fardosPorPalletInput = document.getElementById('fardosPorPalletInput');
     if (!totalPbrInput || totalPbrInput.value.trim() === '' || Number.isNaN(Number(totalPbrInput.value))) {
         showFormAlert('error', 'Preencha o total de pallets utilizados com um número válido.');
-        return false;
-    }
-    if (!fardosPorPalletInput || fardosPorPalletInput.value.trim() === '' || Number.isNaN(Number(fardosPorPalletInput.value))) {
-        showFormAlert('error', 'Preencha a quantidade de fardos por pallet com um número válido.');
         return false;
     }
 
@@ -404,7 +409,6 @@ async function saveChecklist(event) {
         palletsInbound: '0',
         palletsOutbound: '0',
         totalPbr: document.getElementById('totalPbrInput')?.value || '0',
-        fardosPorPallet: document.getElementById('fardosPorPalletInput')?.value || '0',
         hygieneNote: document.getElementById('hygieneObservation')?.value || '',
         lacre1: document.getElementById('lacre1Input')?.value || '',
         lacre2: document.getElementById('lacre2Input')?.value || '',
@@ -428,23 +432,21 @@ async function saveChecklist(event) {
 
     const itemRows = document.querySelectorAll('#itemTableBody tr');
     itemRows.forEach(row => {
-        const inputs = row.querySelectorAll('.table-input');
         const item = {
-            description: inputs[0]?.value || '',
-            code: inputs[1]?.value || '',
-            previsto: parseInt(inputs[2]?.value) || 0,
-            realizado: parseInt(inputs[3]?.value) || 0,
-            faltas: parseInt(inputs[4]?.value) || 0,
-            sobras: parseInt(inputs[5]?.value) || 0,
-            avarias: parseInt(inputs[6]?.value) || 0,
-            scrap: parseInt(inputs[7]?.value) || 0,
-            avariasInternas: parseInt(inputs[8]?.value) || 0,
-            bons: parseInt(inputs[9]?.value) || 0
+            code: row.querySelector('.val-item-code')?.value || '',
+            previsto: parseInt(row.querySelector('.val-previsto')?.value) || 0,
+            realizado: parseInt(row.querySelector('.val-realizado')?.value) || 0,
+            faltas: parseInt(row.querySelector('.res-falta')?.value) || 0,
+            sobras: parseInt(row.querySelector('.res-sobra')?.value) || 0,
+            avarias: parseInt(row.querySelector('.val-avaria')?.value) || 0,
+            scrap: parseInt(row.querySelector('.val-scrap')?.value) || 0,
+            avariasInternas: parseInt(row.querySelector('.val-avint')?.value) || 0,
+            bons: parseInt(row.querySelector('.res-bons')?.value) || 0
         };
         checklistData.items.push(item);
     });
 
-    checklistData.totalFardos = checklistData.items.reduce((sum, item) => sum + item.realizado, 0);
+    checklistData.totalFardos = checklistData.items.reduce((sum, item) => sum + item.previsto, 0);
     checklistData.avariados = checklistData.items.reduce((sum, item) => sum + item.avarias, 0);
     checklistData.scrap = checklistData.items.reduce((sum, item) => sum + item.scrap, 0);
     checklistData.avariasInternas = checklistData.items.reduce((sum, item) => sum + item.avariasInternas, 0);

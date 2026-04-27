@@ -428,7 +428,7 @@ async function saveChecklist(event) {
     const criteria = ["Paredes Internas", "Sem Furos", "Teto", "Chão Limpo", "Sem Odor", "Sem Pragas"];
     criteria.forEach(item => {
         const selected = document.querySelector(`input[name="${item}"]:checked`);
-        checklistData.hygiene[item] = selected ? (selected.id.endsWith('c') ? 'C' : 'NC') : 'N/A';
+        checklistData.hygiene[item] = selected ? (selected.id.endsWith('nc') ? 'NC' : 'C') : 'N/A';
     });
 
     const itemRows = document.querySelectorAll('#itemTableBody tr');

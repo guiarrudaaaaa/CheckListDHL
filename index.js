@@ -401,6 +401,7 @@ async function saveChecklist(event) {
         operationType: operationType === 'INBOUND' ? 'IN' : 'OUT',
         dtNumber: document.getElementById('dtNumberInput')?.value || '',
         driverName: document.getElementById('driverNameInput')?.value || '',
+        origem: document.getElementById('origemInput')?.value || '',
         placaCavalo: document.getElementById('placaCavaloInput')?.value || '',
         placaCarreta1: document.getElementById('placaCarreta1Input')?.value || '',
         placaCarreta2: document.getElementById('placaCarreta2Input')?.value || '',

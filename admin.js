@@ -309,6 +309,7 @@ function viewChecklistDetails(index) {
                         <div><strong>Doca:</strong> ${formatValue(checklist.doca)}</div>
                         <div><strong>Transportadora:</strong> ${formatValue(checklist.transportadora)}</div>
                         <div><strong>Check-in:</strong> ${formatValue(checklist.checkinTime)}</div>
+                        <div><strong>Origem:</strong> ${formatValue(checklist.origem)}</div>
                     </div>
                 </div>
 

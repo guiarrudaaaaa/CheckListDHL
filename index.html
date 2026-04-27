@@ -28,7 +28,7 @@
 
             <!-- Seção central: Logotipos da DHL e Suzano -->
             <div class="navbar-center logos-center">
-                <img src="images/DHL_Logo_BF_rgb.png" alt="DHL" class="brand-logo" /> <!-- Logo DHL -->
+                <img src="images/" alt="DHL" class="brand-logo" /> <!-- Logo DHL -->
                 <img src="images/suzano-logo.png" alt="Suzano" class="brand-logo-suzano" /> <!-- Logo Suzano -->
             </div>
 
@@ -61,8 +61,8 @@
                     <div class="md:col-span-4">
                         <label class="text-[10px] font-bold text-black uppercase">Fluxo</label>
                         <select id="operationTypeSelect" class="input-field font-bold text-dhl-red" required>
-                            <option value="INBOUND">INBOUND (Entrada)</option>
-                            <option value="OUTBOUND">OUTBOUND (Saída)</option>
+                            <option value="INBOUND">INBOUND (Entrada) </option>
+                            <option value="OUTBOUND">OUTBOUND (Saída) </option>
                         </select>
                     </div>
                     <!-- Campo NF/DT: Nota fiscal ou documento de transporte -->
@@ -105,6 +105,10 @@
                         <label class="text-[10px] font-bold text-black uppercase">Placa Carreta 2</label>
                         <input id="placaCarreta2Input" type="text" class="input-field uppercase" required>
                     </div>
+                                        <div class="md:col-span-4">
+                        <label class="text-[10px] font-bold text-black uppercase">Origem</label>
+                        <input id="origemInput" type="text" class="input-field uppercase" required>
+                    </div>
                 </div>
             </section>
 
@@ -122,54 +126,71 @@
                 </div>
             </section>
 
-            <!-- ===== SEÇÃO 3: CONFERÊNCIA TÉCNICA DE ITENS ===== -->
-            <!-- Tabela para conferência de itens com cálculos automáticos -->
-            <section class="glass-card p-0 overflow-hidden border-l-4 border-dhl-yellow">
-                <div class="bg-white p-5 flex justify-between items-center border-b border-muted">
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">03</span> <!-- Número da seção -->
-                        <h2 class="text-black font-bold uppercase">Conferência Técnica de Itens</h2> <!-- Título da seção -->
-                    </div>
-                    <button type="button" onclick="addItemRow()" class="dhl-yellow text-black px-6 py-2 rounded-xl text-xs font-black uppercase shadow-lg">＋ Item</button> <!-- Botão para adicionar item -->
-                </div>
+<!-- ===== SEÇÃO 3: CONFERÊNCIA TÉCNICA DE ITENS (TRECHO CORRIGIDO) ===== -->
+<section class="glass-card p-0 overflow-hidden border-l-4 border-dhl-yellow">
+    <div class="max-w-[1200px] mx-auto">
+        <div class="bg-white p-5 flex flex-wrap justify-between items-center gap-3 border-b border-muted">
+            <div class="flex items-center gap-3">
+                <span class="w-8 h-8 dhl-yellow text-black flex items-center justify-center rounded-lg font-black italic">03</span>
+                <h2 class="text-black font-bold uppercase">Conferência Técnica de Itens</h2>
+            </div>
+            <button type="button" onclick="addItemRow()" class="dhl-yellow text-black px-6 py-2 rounded-xl text-xs font-black uppercase shadow-lg">＋ Item</button>
+        </div>
 
-                <div class="overflow-hidden">
-                    <table class="table-fixed-cols">
-                        <thead class="bg-panel border-b">
-                            <tr>
-                                <th class="col-code">Código</th> <!-- Coluna código -->
-                                <th class="col-num bg-panel">Previsto</th> <!-- Coluna quantidade prevista -->
-                                <th class="col-num bg-panel">Realizado</th> <!-- Coluna quantidade realizada -->
-                                <th class="col-num text-dhl-red">Falta</th> <!-- Coluna faltas (calculada) -->
-                                <th class="col-num text-dark-green">Sobra</th> <!-- Coluna sobras (calculada) -->
-                                <th class="col-num">Avaria</th> <!-- Coluna avarias -->
-                                <th class="col-num">Scrap</th> <!-- Coluna scrap -->
-                                <th class="col-num">Av. Int.</th> <!-- Coluna avarias internas -->
-                                <th class="col-total bg-panel text-black">Total Bons</th> <!-- Coluna total bons (calculada) -->
-                                <th class="w-[50px]"></th> <!-- Coluna ações -->
-                            </tr>
-                        </thead>
-                        <tbody id="itemTableBody"></tbody> <!-- Corpo da tabela preenchido dinamicamente -->
-                    </table>
-                </div>
+        <!-- Container da Tabela Centralizado -->
+        <div class="overflow-x-auto p-6">
+            <table class="table-fixed-cols">
+                <thead>
+                    <tr>
+                        <th class="col-code">Código</th>
+                        <th class="col-num">Previsto</th>
+                        <th class="col-num">Realizado</th>
+                        <th class="col-num text-dhl-red">Falta</th>
+                        <th class="col-num text-dark-green">Sobra</th>
+                        <th class="col-num">Avaria</th>
+                        <th class="col-num">Scrap</th>
+                        <th class="col-num">Av. Int.</th>
+                        <th class="col-total">Total Bons</th>
+                        <th class="w-[50px]"></th>
+                    </tr>
+                </thead>
+                <tbody id="itemTableBody">
+                    <!-- Exemplo de como deve ser a linha gerada pelo JS para ficar centralizada -->
+                    <!-- 
+                    <tr>
+                        <td><input type="text" class="table-input" placeholder="Cód."></td>
+                        <td><input type="number" class="table-input"></td>
+                        <td><input type="number" class="table-input"></td>
+                        <td class="font-bold text-dhl-red">0</td>
+                        <td class="font-bold text-dark-green">0</td>
+                        <td><input type="number" class="table-input"></td>
+                        <td><input type="number" class="table-input"></td>
+                        <td><input type="number" class="table-input"></td>
+                        <td class="font-bold">0</td>
+                        <td><button class="text-gray-400">✕</button></td>
+                    </tr>
+                    -->
+                </tbody>
+            </table>
+        </div>
 
-                <!-- ===== TOTALS E RESUMO ===== -->
-                <!-- Cards com totais de faltas, sobras e itens bons -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
-                    <div class="bg-panel p-6 rounded-2xl border border-muted shadow-sm">
-                        <p class="text-[9px] font-black text-black uppercase mb-3">Divergência (Faltas)</p>
-                        <p id="totalFaltas" class="text-4xl font-black text-dhl-red">0</p> <!-- Total de faltas -->
-                    </div>
-                    <div class="bg-panel p-6 rounded-2xl border border-muted shadow-sm">
-                        <p class="text-[9px] font-black text-black uppercase mb-3">Total Sobras (Não somado no Final)</p>
-                        <p id="totalSobra" class="text-4xl font-black text-dark-green">0</p> <!-- Total de sobras -->
-                    </div>
-                    <div class="bg-panel p-6 rounded-2xl border-l-4 border-dhl-yellow shadow-sm">
-                        <p class="text-[9px] font-black text-black uppercase mb-3">Total Bons p/ Entrada</p>
-                        <p id="totalBonsGeral" class="text-4xl font-black text-black">0</p> <!-- Total de itens bons -->
-                    </div>
-                </div>
-            </section>
+        <!-- ===== TOTALS E RESUMO (CENTRALIZADOS E PADRONIZADOS) ===== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 w-full">
+            <div class="bg-panel p-6 rounded-2xl border border-muted shadow-sm total-card">
+                <p class="text-[10px] font-black text-black uppercase mb-3">Divergência (Faltas)</p>
+                <p id="totalFaltas" class="text-5xl font-black text-dhl-red">0</p>
+            </div>
+            <div class="bg-panel p-6 rounded-2xl border border-muted shadow-sm total-card">
+                <p class="text-[10px] font-black text-black uppercase mb-3">Total Sobras</p>
+                <p id="totalSobra" class="text-5xl font-black text-dark-green">0</p>
+            </div>
+            <div class="bg-panel p-6 rounded-2xl border-l-4 border-dhl-yellow shadow-sm total-card">
+                <p class="text-[10px] font-black text-black uppercase mb-3">Total Bons p/ Entrada</p>
+                <p id="totalBonsGeral" class="text-5xl font-black text-black">0</p>
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- ===== SEÇÃO 4: CONTROLE DE PALETES ===== -->
             <section class="glass-card p-8">

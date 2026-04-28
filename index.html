@@ -14,7 +14,6 @@
     <!-- ===== ESTILOS PRÓPRIOS ===== -->
     <!-- Carrega o arquivo CSS personalizado com estilos DHL -->
     <link rel="stylesheet" href="index.css">
-</head>
 <body>
     <!-- ===== CABEÇALHO PRINCIPAL ===== -->
     <!-- Barra de navegação fixa no topo com logos e informações -->
@@ -214,9 +213,22 @@
                     <h2 class="text-black font-bold uppercase">Observações da Carga</h2> <!-- Título da seção -->
                 </div>
                 <textarea id="cargoObservations" class="w-full h-[80px] bg-white border border-black rounded-xl p-4 text-xs font-semibold outline-none focus-ring-dhl-red" placeholder="Lote, detalhes de avaria, etc..."></textarea> <!-- Campo de texto -->
+                <div class="mt-6 max-w-4xl mx-auto">
+                    <label for="cargoPhotosInput" class="text-[10px] font-bold text-black uppercase block mb-4">Fotos da Carga</label>
+                    <div class="photo-upload-card">
+                        <label for="cargoPhotosInput" class="photo-upload-label">
+                            <span class="photo-upload-icon">📷</span>
+                            <span class="photo-upload-title">Clique ou arraste as fotos da carga aqui</span>
+                            <span class="photo-upload-subtitle">Suporta múltiplas imagens JPG, PNG ou HEIC</span>
+                        </label>
+                        <input id="cargoPhotosInput" type="file" class="photo-upload-input" accept="image/*" multiple>
+                        <div id="cargoPhotosPreview" class="photo-preview-grid" aria-live="polite"></div>
+                        <p class="photo-upload-note">Anexe fotos da carga para referência no painel admin.</p>
+                    </div>
+                </div>
             </section>
 
-            <!-- ===== SEÇÃO 6: LACRES E ASSINATURAS ===== -->
+                        <!-- ===== SEÇÃO 6: LACRES E ASSINATURAS ===== -->
             <!-- Campos para lacres e áreas de assinatura -->
             <section class="glass-card p-8">
                 <div class="flex items-center gap-3 mb-6">
@@ -255,6 +267,7 @@
 
     <!-- ===== JAVASCRIPT ===== -->
     <script type="module" src="firebase-init.js"></script>
+    <script src="common.js"></script>
     <!-- Carrega o arquivo JavaScript para funcionalidades interativas -->
     <script src="index.js"></script>
 </body>

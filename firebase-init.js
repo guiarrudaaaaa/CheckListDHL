@@ -11,6 +11,7 @@ import {
   deleteDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 // Configuração do Firebase para o projeto Check List DHL
 const firebaseConfig = {
@@ -27,6 +28,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 // Expõe para uso em outros scripts da página
 window.firebaseApp = app;
@@ -40,3 +42,4 @@ window.firebaseOrderBy = orderBy;
 window.firebaseDoc = doc;
 window.firebaseDeleteDoc = deleteDoc;
 window.firebaseServerTimestamp = serverTimestamp;
+window.firebaseAuth = auth;

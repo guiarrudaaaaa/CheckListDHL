@@ -1,20 +1,86 @@
-// ===== CONFIGURAÇÃO DO RELÓGIO AO VIVO =====
-// Atualiza o relógio no cabeçalho a cada segundo com formato brasileiro
-function updateClock() {
-    // Obtém a hora atual
-    const now = new Date();
-    // Formata a hora em português brasileiro (HH:MM:SS)
-    const time = now.toLocaleTimeString('pt-BR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
-    // Atualiza o elemento HTML com o horário
-    document.getElementById('liveTime').textContent = time;
+import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import './common.js';
+
+const auth = window.firebaseAuth;
+
+// Debug: Verificar se Firebase Auth está inicializado
+console.log("Firebase Auth inicializado:", !!auth);
+console.log("Firebase Auth config:", auth.app.options.projectId);
+
+// Verificar se há um usuário já logado na inicialização
+auth.onAuthStateChanged((user) => {
+  console.log("Estado inicial de auth:", user ? "logado" : "não logado");
+});
+
+// Este código corre assim que a página carrega
+onAuthStateChanged(auth, (user) => {
+  console.log("onAuthStateChanged chamado, user:", user ? user.email : "null");
+
+  // Garantir que os elementos existem antes de manipulá-los
+  const loginSection = document.getElementById('loginSection');
+  const adminMain = document.getElementById('adminMain');
+
+  if (!loginSection || !adminMain) {
+    console.error("Elementos do DOM não encontrados!");
+    return;
+  }
+
+  if (user) {
+    // Utilizador está logado, mostra o painel admin
+    console.log("Usuário logado, mostrando painel admin");
+    loginSection.style.display = 'none';
+    adminMain.style.display = 'block';
+    console.log("Bem-vindo, " + user.email);
+  } else {
+    // Não há ninguém logado, mostra o form de login
+    console.log("Nenhum usuário logado, mostrando form de login");
+    loginSection.style.display = 'flex';
+    adminMain.style.display = 'none';
+  }
+});
+
+// Função de logout
+function logout() {
+  signOut(auth).then(() => {
+    // Logout com sucesso, o onAuthStateChanged vai mostrar o login
+    console.log("Logout realizado");
+  }).catch((error) => {
+    console.error("Erro ao fazer logout:", error);
+  });
 }
-// Inicia o relógio e atualiza a cada 1000ms (1 segundo)
-setInterval(updateClock, 1000);
-updateClock(); // Chama imediatamente para evitar delay inicial
+
+// Função para fazer login no admin
+function fazerLoginAdmin(email, password) {
+  console.log("Tentando fazer login com:", email);
+  document.getElementById('loginError').classList.add('hidden');
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Login com sucesso
+      console.log("Login realizado com sucesso!", userCredential.user.email);
+      // O onAuthStateChanged será chamado automaticamente e mostrará o painel
+    })
+    .catch((error) => {
+      // Se houver erro
+      console.error("Erro ao fazer login:", error.code, error.message);
+      document.getElementById('loginError').textContent = `Erro: ${error.message}`;
+      document.getElementById('loginError').classList.remove('hidden');
+    });
+}
+
+// Event listener para o botão de logout
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+// Event listener para o form de login admin
+document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+  fazerLoginAdmin(email, password);
+});
+
+// ===== CONFIGURAÇÃO DO RELÓGIO AO VIVO =====
+// O relógio é iniciado automaticamente em common.js
 
 async function carregarRelatorio() {
     if (!window.firebaseDb || !window.firebaseCollection || !window.firebaseGetDocs || !window.firebaseQuery || !window.firebaseOrderBy) {
@@ -75,11 +141,7 @@ async function carregarRelatorio() {
 }
 
 // ===== SEGURANÇA E SANITIZAÇÃO =====
-// Função para sanitizar entrada de texto (remove tags HTML e caracteres perigosos)
-function sanitizeText(input) {
-    if (typeof input !== 'string') return '';
-    return input.replace(/[<>'"&]/g, '').trim();
-}
+// Funções de sanitização estão em common.js
 
 // Função para sanitizar HTML gerado dinamicamente
 function safeSetInnerHTML(element, html) {
@@ -156,13 +218,7 @@ function updateMetrics() {
 }
 
 // ===== FUNÇÃO UTILITÁRIA =====
-// Formata valores para exibição, substituindo valores vazios por '—'
-const formatValue = (val) => {
-    // Verifica se o valor é null, undefined ou string vazia
-    if (val === null || val === undefined || val === '') return '—';
-    // Converte para string maiúscula
-    return String(val).toUpperCase();
-};
+// Função formatValue está em common.js
 
 // ===== RENDERIZAÇÃO DA TABELA =====
 // Renderiza a tabela de registros aplicando filtros e busca
@@ -312,6 +368,11 @@ function viewChecklistDetails(index) {
                         <div><strong>Transportadora:</strong> ${formatValue(checklist.transportadora)}</div>
                         <div><strong>Check-in:</strong> ${formatValue(checklist.checkinTime)}</div>
                         <div><strong>Origem:</strong> ${formatValue(checklist.origem)}</div>
+                        <div><strong>Documentos:</strong> ${formatValue(checklist.cpfCnh)}</div>
+                        <div><strong>Carreta 2:</strong> ${formatValue(checklist.placaCarreta2)}</div>
+                        <div><strong>Status Lacre:</strong> ${formatValue(checklist.statusLacre)}</div>
+                        <div><strong>Lacre 01:</strong> ${formatValue(checklist.lacre1)}</div>
+                        <div><strong>Lacre 2:</strong> ${formatValue(checklist.lacre2)}</div>
                     </div>
                 </div>
 
@@ -334,6 +395,38 @@ function viewChecklistDetails(index) {
                     <p class="text-gray-700">${hygieneNote}</p>
                 </div>
                 ` : ''}
+
+                ${checklist.photos && checklist.photos.length > 0 ? `
+                <div class="bg-white p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-3">📷 Fotos da Carga</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        ${checklist.photos.map((photo, index) => `
+                            <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                                <img src="${photo.dataURL || photo}" alt="Foto ${index + 1}" class="w-full h-40 object-cover">
+                                <div class="p-2 text-[10px] text-slate-600">${photo.name || `Foto ${index + 1}`}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="bg-white p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-3">✍️ Assinaturas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="font-semibold text-sm mb-2">Motorista</p>
+                            <div class="bg-slate-50 rounded-xl border border-slate-200 p-3">
+                                ${checklist.driverSignature ? `<img src="${checklist.driverSignature}" alt="Assinatura Motorista" class="w-full h-40 object-contain">` : '<span class="text-slate-500 text-sm">Sem assinatura</span>'}
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm mb-2">Conferente (RE)</p>
+                            <div class="bg-slate-50 rounded-xl border border-slate-200 p-3">
+                                ${checklist.checkerSignature ? `<img src="${checklist.checkerSignature}" alt="Assinatura Conferente" class="w-full h-40 object-contain">` : '<span class="text-slate-500 text-sm">Sem assinatura</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Itens -->
                 <div class="bg-yellow-50 p-4 rounded-lg">
@@ -558,3 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(loadChecklists, 3000);
     setInterval(carregarRelatorio, 10000);
 });
+
+// Expor funções para uso global (necessário para onclick inline em módulos ES6)
+window.viewChecklistDetails = viewChecklistDetails;
+window.deleteChecklist = deleteChecklist;

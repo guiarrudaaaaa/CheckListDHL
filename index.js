@@ -1,106 +1,14 @@
 // ===== CONFIGURAÇÃO DO RELÓGIO AO VIVO =====
-// Atualiza o relógio no cabeçalho a cada segundo
-function updateClock() {
-    // Obtém a hora atual formatada em português brasileiro
-    document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('pt-BR');
-}
-// Inicia o relógio e atualiza a cada 1000ms (1 segundo)
-setInterval(updateClock, 1000);
-updateClock(); // Chama imediatamente para evitar delay inicial
+// O relógio é iniciado automaticamente em common.js
 
-function resizeSignatureCanvas(canvas) {
-    if (!canvas) return;
-    const ratio = window.devicePixelRatio || 1;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    canvas.width = Math.floor(width * ratio);
-    canvas.height = Math.floor(height * ratio);
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(ratio, ratio);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    canvas.dataset.drawn = canvas.dataset.drawn || 'false';
-}
-
-function clearSignature(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.dataset.drawn = 'false';
-    resizeSignatureCanvas(canvas);
-}
-
-function isCanvasBlank(canvas) {
-    return !canvas || canvas.dataset.drawn !== 'true';
-}
-
-function getSignatureData(canvas) {
-    return canvas && !isCanvasBlank(canvas) ? canvas.toDataURL('image/png') : '';
-}
-
-function initSignatureCanvas(canvasId) {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    resizeSignatureCanvas(canvas);
-
-    let drawing = false;
-    let lastX = 0;
-    let lastY = 0;
-
-    const getPointerPosition = event => {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top
-        };
-    };
-
-    const startDraw = event => {
-        event.preventDefault();
-        drawing = true;
-        const pos = getPointerPosition(event);
-        lastX = pos.x;
-        lastY = pos.y;
-        const ctx = canvas.getContext('2d');
-        ctx.beginPath();
-        ctx.arc(lastX, lastY, ctx.lineWidth / 2, 0, Math.PI * 2);
-        ctx.fill();
-        canvas.dataset.drawn = 'true';
-        canvas.setPointerCapture(event.pointerId);
-    };
-
-    const draw = event => {
-        if (!drawing) return;
-        event.preventDefault();
-        const pos = getPointerPosition(event);
-        const ctx = canvas.getContext('2d');
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        lastX = pos.x;
-        lastY = pos.y;
-        canvas.dataset.drawn = 'true';
-    };
-
-    const stopDraw = event => {
-        drawing = false;
-        if (event.pointerId) {
-            canvas.releasePointerCapture(event.pointerId);
-        }
-    };
-
-    canvas.addEventListener('pointerdown', startDraw);
-    canvas.addEventListener('pointermove', draw);
-    canvas.addEventListener('pointerup', stopDraw);
-    canvas.addEventListener('pointercancel', stopDraw);
-    canvas.addEventListener('pointerleave', stopDraw);
-}
+// ===== INICIALIZAÇÃO DE CANVAS DE ASSINATURA =====
+// Inicializa todos os canvas de assinatura na página
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializa canvas de assinatura do motorista
+    initSignatureCanvas('signatureCanvas');
+    // Inicializa canvas de assinatura do conferente
+    initSignatureCanvas('signatureCanvas2');
+});
 
 
 // ===== SEGURANÇA E SANITIZAÇÃO =====
@@ -321,6 +229,81 @@ function numericOnly(el) {
     el.value = el.value.replace(/\D+/g, '');
 }
 
+let selectedCargoPhotos = [];
+
+function readFilesAsDataURLs(files) {
+    return Promise.all(Array.from(files || []).map(file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({ name: file.name, type: file.type, dataURL: reader.result });
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    })));
+}
+
+function rebuildCargoPhotoInputFiles() {
+    const input = document.getElementById('cargoPhotosInput');
+    if (!input) return;
+    const dataTransfer = new DataTransfer();
+    selectedCargoPhotos.forEach(file => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+}
+
+function handleCargoPhotosInputChange() {
+    const input = document.getElementById('cargoPhotosInput');
+    if (!input) return;
+    const newFiles = Array.from(input.files || []).filter(file => file.type.startsWith('image/'));
+    selectedCargoPhotos = selectedCargoPhotos.concat(newFiles);
+    rebuildCargoPhotoInputFiles();
+    updateCargoPhotoPreview();
+}
+
+function updateCargoPhotoPreview() {
+    const preview = document.getElementById('cargoPhotosPreview');
+    if (!preview) return;
+    preview.innerHTML = '';
+
+    if (!selectedCargoPhotos || selectedCargoPhotos.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'photo-preview-empty';
+        emptyState.textContent = 'Nenhuma imagem adicionada ainda.';
+        preview.appendChild(emptyState);
+        return;
+    }
+
+    selectedCargoPhotos.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const item = document.createElement('div');
+            item.className = 'photo-preview-item';
+            item.innerHTML = `
+                <img src="${reader.result}" alt="Pré‑visualização da foto ${file.name}">
+                <button type="button" class="photo-preview-remove" data-index="${index}" aria-label="Remover imagem"></button>
+                <span title="${file.name}">${file.name}</span>
+            `;
+            const removeButton = item.querySelector('.photo-preview-remove');
+            if (removeButton) {
+                removeButton.addEventListener('click', () => removeCargoPhoto(index));
+            }
+            preview.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeCargoPhoto(index) {
+    if (index < 0 || index >= selectedCargoPhotos.length) return;
+    selectedCargoPhotos.splice(index, 1);
+    rebuildCargoPhotoInputFiles();
+    updateCargoPhotoPreview();
+}
+
+function clearCargoPhotoPreview() {
+    selectedCargoPhotos = [];
+    rebuildCargoPhotoInputFiles();
+    const preview = document.getElementById('cargoPhotosPreview');
+    if (preview) preview.innerHTML = '';
+}
+
 function validateChecklist() {
     const form = document.getElementById('mainChecklist');
     if (!form.checkValidity()) {
@@ -376,9 +359,10 @@ addItemRow();
 initSignatureCanvas('driverSignatureCanvas');
 initSignatureCanvas('checkerSignatureCanvas');
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadChecklists();
-});
+const cargoPhotosInput = document.getElementById('cargoPhotosInput');
+if (cargoPhotosInput) {
+    cargoPhotosInput.addEventListener('change', handleCargoPhotosInputChange);
+}
 
 // ===== SALVAMENTO DO CHECKLIST =====
 // Função para salvar o checklist no Firebase Firestore
@@ -431,6 +415,9 @@ async function saveChecklist(event) {
         checklistData.hygiene[item] = selected ? (selected.id.endsWith('nc') ? 'NC' : 'C') : 'N/A';
     });
 
+    const photoFiles = document.getElementById('cargoPhotosInput')?.files;
+    checklistData.photos = photoFiles && photoFiles.length > 0 ? await readFilesAsDataURLs(photoFiles) : [];
+
     const itemRows = document.querySelectorAll('#itemTableBody tr');
     itemRows.forEach(row => {
         const item = {
@@ -475,6 +462,7 @@ async function saveChecklist(event) {
 
         showFormAlert('success', 'Checklist enviado para o painel admin com sucesso!');
         document.getElementById('mainChecklist').reset();
+        clearCargoPhotoPreview();
         clearSignature('driverSignatureCanvas');
         clearSignature('checkerSignatureCanvas');
         auditAll();

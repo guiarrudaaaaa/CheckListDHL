@@ -1,14 +1,4 @@
-/* ===== CONFIGURAÇÕES GLOBAIS E TOKENS DE DESIGN ===== */
-/* Define as cores e fontes da marca DHL para consistência visual */
-:root {
-    --dhl-yellow: #FFCC00; /* Amarelo assinatura da DHL */
-    --dhl-red: #D40511; /* Vermelho assinatura da DHL */
-    --dhl-black: #000000; /* Cor principal do texto */
-    --dhl-white: #FFFFFF; /* Cor de fundo principal */
-    --dhl-dark-green: #006443; /* Verde escuro para sucesso */
-    --border-muted: rgba(0, 0, 0, 0.12); /* Tom sutil para bordas */
-    --font-stack: 'DHL Delivery', 'Frutiger', 'Helvetica', 'Arial', sans-serif; /* Pilha de fontes com fallbacks */
-}
+@import "styles.css";
 
 /* ===== DECLARAÇÕES DE FONTE PERSONALIZADA ===== */
 /* Fontes proprietárias da DHL - descomente quando os arquivos estiverem disponíveis */
@@ -34,20 +24,6 @@
     src: url('fonts/DHL-Delivery-Black.woff2') format('woff2');
 }
 */
-
-/* ===== RESET E ESTILOS BASE ===== */
-/* Aplica a fonte DHL Delivery em todos os elementos */
-* {
-    margin: 0; /* Remove margens padrão */
-    padding: 0; /* Remove padding padrão */
-    box-sizing: border-box; /* Inclui padding e border na largura */
-}
-
-html,
-body,
-input,
-button,
-select,
 textarea,
 th,
 td {
@@ -156,6 +132,21 @@ body {
     border-radius: 9999px; /* Bordas arredondadas */
     font-weight: 600; /* Peso semi-bold */
     font-variant-numeric: tabular-nums; /* Números tabulares */
+}
+
+.navbar-logout-btn {
+    background: var(--dhl-red); /* Fundo vermelho */
+    color: var(--dhl-white); /* Texto branco */
+    padding: 0.55rem 1rem; /* Padding */
+    border-radius: 9999px; /* Bordas arredondadas */
+    font-weight: 600; /* Peso semi-bold */
+    border: none; /* Sem borda */
+    cursor: pointer; /* Cursor pointer */
+    transition: background 0.2s; /* Transição suave */
+}
+
+.navbar-logout-btn:hover {
+    background: var(--dhl-red-dark); /* Fundo vermelho escuro no hover */
 }
 
 .navbar-avatar {
@@ -431,11 +422,23 @@ body {
 .badge-in,
 .badge-out,
 .badge-doca,
+.badge-conforme,
+.badge-nao-conforme,
 .status-chegada,
 .status-doca,
 .status-despacho {
     background: rgba(212, 5, 17, 0.12); /* Fundo vermelho sutil */
     color: var(--dhl-red); /* Texto vermelho */
+}
+
+.badge-conforme {
+    background: rgba(34, 197, 94, 0.12); /* Fundo verde sutil */
+    color: #22c55e; /* Texto verde */
+}
+
+.badge-nao-conforme {
+    background: rgba(239, 68, 68, 0.12); /* Fundo vermelho sutil */
+    color: #ef4444; /* Texto vermelho */
 }
 
 /* ===== CONTAINER DA TABELA ===== */
@@ -501,6 +504,101 @@ td.text-bold { font-weight: 700; text-transform: uppercase; } /* Texto bold mai�
     display: flex; /* Layout flex */
     align-items: center; /* Alinha itens */
     gap: 0.5rem; /* Espaçamento */
+}
+
+/* ===== ESTILOS DO LOGIN ===== */
+.login-overlay {
+    position: fixed; /* Posição fixa */
+    top: 0; /* Topo */
+    left: 0; /* Esquerda */
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+    background: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
+    display: flex; /* Layout flex */
+    align-items: center; /* Centraliza verticalmente */
+    justify-content: center; /* Centraliza horizontalmente */
+    z-index: 1000; /* Z-index alto */
+}
+
+.login-container {
+    width: 100%; /* Largura total */
+    max-width: 400px; /* Largura máxima */
+    padding: 2rem; /* Padding */
+}
+
+.login-card {
+    background: var(--dhl-white); /* Fundo branco */
+    border-radius: 24px; /* Bordas arredondadas */
+    box-shadow: 0 14px 35px -15px rgba(0, 0, 0, 0.18); /* Sombra */
+    padding: 2rem; /* Padding interno */
+    text-align: center; /* Texto centralizado */
+}
+
+.login-header h1 {
+    font-size: 1.5rem; /* Tamanho do título */
+    font-weight: 700; /* Peso bold */
+    color: var(--dhl-black); /* Cor preta */
+    margin-bottom: 0.5rem; /* Margem inferior */
+}
+
+.login-header p {
+    color: rgba(0, 0, 0, 0.6); /* Cor cinza */
+    font-size: 0.9rem; /* Tamanho menor */
+    margin-bottom: 2rem; /* Margem inferior */
+}
+
+.login-form {
+    display: flex; /* Layout flex */
+    flex-direction: column; /* Direção coluna */
+    gap: 1.5rem; /* Espaçamento */
+}
+
+.form-group {
+    text-align: left; /* Alinha à esquerda */
+}
+
+.form-group label {
+    display: block; /* Bloco */
+    font-weight: 600; /* Peso semi-bold */
+    color: var(--dhl-black); /* Cor preta */
+    margin-bottom: 0.5rem; /* Margem inferior */
+}
+
+.form-group input {
+    width: 100%; /* Largura total */
+    padding: 0.75rem; /* Padding */
+    border: 2px solid var(--border-muted); /* Borda sutil */
+    border-radius: 8px; /* Bordas arredondadas */
+    font-size: 1rem; /* Tamanho da fonte */
+    transition: border-color 0.2s; /* Transição na borda */
+}
+
+.form-group input:focus {
+    outline: none; /* Remove outline */
+    border-color: var(--dhl-yellow); /* Borda amarela no foco */
+}
+
+.login-btn {
+    background: var(--dhl-yellow); /* Fundo amarelo */
+    color: var(--dhl-black); /* Texto preto */
+    border: none; /* Sem borda */
+    padding: 0.75rem 2rem; /* Padding */
+    border-radius: 8px; /* Bordas arredondadas */
+    font-weight: 700; /* Peso bold */
+    font-size: 1rem; /* Tamanho */
+    cursor: pointer; /* Cursor pointer */
+    transition: background 0.2s; /* Transição */
+}
+
+.login-btn:hover {
+    background: #e6b800; /* Amarelo escuro no hover */
+}
+
+.login-error {
+    color: var(--dhl-red); /* Cor vermelha */
+    font-size: 0.9rem; /* Tamanho */
+    margin-top: 1rem; /* Margem superior */
+    font-weight: 600; /* Peso semi-bold */
 }
 
 .status-cell span:first-child { font-size: 1.1rem; } /* Primeiro span maior */
